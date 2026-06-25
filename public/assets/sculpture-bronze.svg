@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 940" role="img" aria-label="Patinated bronze abstract sculpture">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f7f1e7"/>
+      <stop offset="1" stop-color="#d6c9b7"/>
+    </linearGradient>
+    <linearGradient id="metal" x1=".15" y1=".1" x2=".9" y2="1">
+      <stop offset="0" stop-color="#d7b46a"/>
+      <stop offset=".3" stop-color="#80633a"/>
+      <stop offset=".64" stop-color="#1f5c4a"/>
+      <stop offset="1" stop-color="#171515"/>
+    </linearGradient>
+  </defs>
+  <rect width="900" height="940" fill="url(#bg)"/>
+  <ellipse cx="450" cy="790" rx="260" ry="45" fill="#171515" opacity=".12"/>
+  <rect x="304" y="733" width="292" height="60" fill="#221f1b"/>
+  <path d="M421 700c-88-105-102-225-41-358 40-87 105-159 195-216-22 120 4 207 77 263 69 54 88 135 57 244-29 103-95 170-198 201z" fill="url(#metal)"/>
+  <path d="M490 198c-73 95-88 190-43 286 36 78 35 159-5 243-67-103-79-216-36-340 18-53 46-116 84-189z" fill="#101514" opacity=".28"/>
+  <circle cx="548" cy="516" r="66" fill="#f7f1e7" opacity=".88"/>
+</svg>

@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SOMTO ATELIER — Presentation</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Inter, system-ui, sans-serif; background: #f7f1e7; color: #171515; }
+    .slide { min-height: 100vh; padding: 60px 40px; max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; justify-content: center; border-bottom: 1px solid rgba(23,21,21,0.1); }
+    h1 { font-size: 3rem; font-weight: 400; line-height: 1.1; margin-bottom: 20px; }
+    h2 { font-size: 1.6rem; font-weight: 500; margin-bottom: 30px; color: #1f5c4a; }
+    h3 { font-size: 1.1rem; font-weight: 600; margin: 20px 0 8px; }
+    p { font-size: 1.1rem; line-height: 1.6; margin-bottom: 12px; }
+    ul, ol { margin: 10px 0 20px 24px; }
+    li { font-size: 1.05rem; line-height: 1.6; margin-bottom: 6px; }
+    pre { background: #171515; color: #fffaf2; padding: 16px 20px; border-radius: 6px; font-size: 0.85rem; overflow-x: auto; margin: 12px 0; }
+    code { font-family: 'JetBrains Mono', monospace; }
+    table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+    th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid rgba(23,21,21,0.15); font-size: 0.95rem; }
+    th { font-weight: 600; background: rgba(31,92,74,0.08); }
+    .tag { display: inline-block; background: #1f5c4a; color: #fff; padding: 3px 10px; border-radius: 3px; font-size: 0.75rem; font-weight: 600; margin-right: 4px; }
+    .tag.green { background: #1f5c4a; }
+    .tag.dark { background: #171515; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin: 20px 0; }
+    .card { background: rgba(255,255,255,0.5); padding: 20px; border-radius: 6px; }
+    .card h3 { margin-top: 0; }
+    .arrow { font-size: 2rem; text-align: center; margin: 10px 0; color: #1f5c4a; }
+    .badge { display: inline-block; background: #b75b3f; color: #fff; padding: 2px 8px; border-radius: 3px; font-size: 0.7rem; font-weight: 700; }
+    @media (max-width: 600px) { .slide { padding: 40px 20px; } h1 { font-size: 2rem; } .grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+
+<div class="slide">
+  <h1>SOMTO ATELIER</h1>
+  <p style="font-size:1.3rem;color:#1f5c4a;">Full-Stack Web Application</p>
+  <p>A contemporary art gallery platform with user authentication, inquiry management, and email notifications.</p>
+  <br/>
+  <p style="font-size:0.9rem;color:#666;"><strong>Tech Stack:</strong> React 19 • Vite • Node.js • Express • JWT • Resend</p>
+</div>
+
+<div class="slide">
+  <h2>Architecture Overview</h2>
+  <div style="background:#171515;color:#fffaf2;padding:30px;border-radius:8px;font-family:monospace;font-size:0.9rem;line-height:2;">
+    <div style="text-align:center;padding:10px;background:rgba(255,255,255,0.1);border-radius:4px;margin:4px 0;">Browser (React App) — port 5173</div>
+    <div style="text-align:center;">⬇ ⬆</div>
+    <div style="text-align:center;padding:10px;background:rgba(255,255,255,0.1);border-radius:4px;margin:4px 0;">Vite Dev Server (proxy /api)</div>
+    <div style="text-align:center;">⬇ ⬆</div>
+    <div style="text-align:center;padding:10px;background:rgba(255,255,255,0.1);border-radius:4px;margin:4px 0;">Express API Server — port 3001</div>
+    <div style="text-align:center;">⬇</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+      <div style="text-align:center;padding:10px;background:rgba(255,255,255,0.08);border-radius:4px;">users.json</div>
+      <div style="text-align:center;padding:10px;background:rgba(255,255,255,0.08);border-radius:4px;">submissions.json</div>
+    </div>
+  </div>
+  <p style="margin-top:16px;font-size:0.9rem;">Vite proxies <code>/api</code> requests to Express — no CORS issues.</p>
+</div>
+
+<div class="slide">
+  <h2>Frontend Components</h2>
+  <table>
+    <tr><th>Component</th><th>Purpose</th></tr>
+    <tr><td>Header</td><td>Nav bar with auth state (Sign in / Log out)</td></tr>
+    <tr><td>Hero</td><td>Landing section with gallery intro</td></tr>
+    <tr><td>Collection</td><td>Artwork grid with filter tabs</td></tr>
+    <tr><td>Auth</td><td>Login / Register form with validation</td></tr>
+    <tr><td>Visit</td><td>Protected inquiry form (logged-in only)</td></tr>
+    <tr><td>InquiryBag</td><td>Slide-in cart for selected artworks</td></tr>
+  </table>
+  <p style="margin-top:12px;font-size:0.85rem;color:#666;">All components live in a single file: <code>src/App.jsx</code></p>
+</div>
+
+<div class="slide">
+  <h2>API Endpoints</h2>
+  <table>
+    <tr><th>Method</th><th>Endpoint</th><th>Auth</th><th>Purpose</th></tr>
+    <tr><td><span class="tag green">POST</span></td><td>/api/register</td><td>—</td><td>Create account</td></tr>
+    <tr><td><span class="tag green">POST</span></td><td>/api/login</td><td>—</td><td>Sign in, get JWT</td></tr>
+    <tr><td><span class="tag dark">GET</span></td><td>/api/me</td><td><span class="badge">JWT</span></td><td>Verify session</td></tr>
+    <tr><td><span class="tag green">POST</span></td><td>/api/inquiry</td><td><span class="badge">JWT</span></td><td>Submit inquiry</td></tr>
+    <tr><td><span class="tag dark">GET</span></td><td>/api/submissions</td><td>—</td><td>View submissions</td></tr>
+    <tr><td><span class="tag dark">GET</span></td><td>/api/users</td><td>—</td><td>View accounts</td></tr>
+  </table>
+</div>
+
+<div class="slide">
+  <h2>Authentication Flow</h2>
+  <div class="grid">
+    <div class="card">
+      <h3>Registration</h3>
+      <ol style="font-size:0.9rem;">
+        <li>User submits name, email, password</li>
+        <li>Server hashes password with <strong>bcrypt</strong></li>
+        <li>Creates <strong>JWT token</strong> (7-day expiry)</li>
+        <li>Saves user to <code>users.json</code></li>
+        <li>Returns token to frontend</li>
+      </ol>
+    </div>
+    <div class="card">
+      <h3>Protected Requests</h3>
+      <ol style="font-size:0.9rem;">
+        <li>Frontend stores token in localStorage</li>
+        <li>Sends as <code>Authorization: Bearer &lt;token&gt;</code></li>
+        <li>Server verifies with <code>jwt.verify()</code></li>
+        <li>Extracts user identity from payload</li>
+        <li>Grants or denies access</li>
+      </ol>
+    </div>
+  </div>
+  <pre style="font-size:0.8rem;">// Auth middleware
+function authMiddleware(req, res, next) {
+  const payload = jwt.verify(token, JWT_SECRET);
+  req.user = payload;
+  next();
+}</pre>
+</div>
+
+<div class="slide">
+  <h2>Inquiry Flow (Protected)</h2>
+  <ol>
+    <li>User browses collection, adds artworks to inquiry bag</li>
+    <li>Fills contact form (interest, selected works)</li>
+    <li>Frontend sends <code>POST /api/inquiry</code> with JWT</li>
+    <li>Server extracts <strong>name & email</strong> from the token</li>
+    <li>Saves inquiry to <code>submissions.json</code></li>
+    <li>Sends <strong>email notification</strong> via Resend API</li>
+    <li>Returns <em>"Your interest has been sent."</em></li>
+  </ol>
+  <div class="arrow">⬇</div>
+  <p style="font-size:0.9rem;color:#666;">User info comes from the JWT — no need to re-type name/email in the form.</p>
+</div>
+
+<div class="slide">
+  <h2>Email Integration (Resend)</h2>
+  <p>When an inquiry is submitted, the gallery owner gets an email:</p>
+  <pre style="font-size:0.85rem;">
+From:    SOMTO ATELIER &lt;onboarding@resend.dev&gt;
+To:      princewillasogwa10@gmail.com
+Subject: New inquiry from [User Name]
+
+Name:     User Name
+Email:    user@example.com
+Interest: Private viewing
+Works:    Abstract Lady, Dreamscape
+
+Submitted: 2026-06-24T21:40:14.556Z</pre>
+  <p><strong>Why Resend?</strong> Simple API, 100 free emails/day, no SMTP config. Just one API key.</p>
+</div>
+
+<div class="slide">
+  <h2>Data Storage: JSON Files</h2>
+  <p>Instead of a traditional database, we use <strong>JSON files</strong> on the server's filesystem.</p>
+  <div class="grid">
+    <div class="card">
+      <h3>users.json</h3>
+      <pre style="font-size:0.75rem;margin:0;">[
+  {
+    "id": 1782338544963,
+    "name": "User Name",
+    "email": "user@example.com",
+    "password": "$2a$10$...",
+    "createdAt": "2026-06-24T..."
+  }
+]</pre>
+    </div>
+    <div class="card">
+      <h3>submissions.json</h3>
+      <pre style="font-size:0.75rem;margin:0;">[
+  {
+    "id": 1782337214556,
+    "name": "User Name",
+    "email": "user@example.com",
+    "interest": "Private viewing",
+    "works": "Abstract Lady",
+    "createdAt": "2026-06-24T..."
+  }
+]</pre>
+    </div>
+  </div>
+  <p style="margin-top:12px;"><strong>Read/Write pattern:</strong> Read file → Parse JSON → Push new entry → Write file</p>
+</div>
+
+<div class="slide">
+  <h2>Security</h2>
+  <table>
+    <tr><th>Measure</th><th>Implementation</th></tr>
+    <tr><td>Password hashing</td><td>bcrypt — 10 salt rounds</td></tr>
+    <tr><td>Authentication</td><td>JWT with 7-day expiry</td></tr>
+    <tr><td>Protected routes</td><td>Auth middleware checks Bearer token</td></tr>
+    <tr><td>Input validation</td><td>Server validates required fields</td></tr>
+    <tr><td>Credentials</td><td>API keys in .env file (gitignored)</td></tr>
+    <tr><td>No plain-text passwords</td><td>Never logged or exposed</td></tr>
+  </table>
+</div>
+
+<div class="slide">
+  <h2>How to Run</h2>
+  <pre style="font-size:0.95rem;">
+# Install dependencies
+npm install
+cd server && npm install && cd ..
+
+# Start both servers with one command
+npm run dev</pre>
+  <table style="width:auto;">
+    <tr><th>Service</th><th>URL</th></tr>
+    <tr><td>Frontend</td><td>http://127.0.0.1:5173</td></tr>
+    <tr><td>Backend API</td><td>http://localhost:3001</td></tr>
+  </table>
+  <p>One command starts both servers simultaneously using <strong>concurrently</strong>.</p>
+</div>
+
+<div class="slide">
+  <h2>Project Stats</h2>
+  <div class="grid">
+    <div class="card" style="text-align:center;">
+      <h3>~1,400</h3>
+      <p style="font-size:0.85rem;">Total lines of code</p>
+    </div>
+    <div class="card" style="text-align:center;">
+      <h3>10</h3>
+      <p style="font-size:0.85rem;">Source files</p>
+    </div>
+    <div class="card" style="text-align:center;">
+      <h3>6</h3>
+      <p style="font-size:0.85rem;">API endpoints</p>
+    </div>
+    <div class="card" style="text-align:center;">
+      <h3>0</h3>
+      <p style="font-size:0.85rem;">External databases</p>
+    </div>
+  </div>
+  <br/>
+  <table>
+    <tr><th>File</th><th>Lines</th><th>Purpose</th></tr>
+    <tr><td>src/App.jsx</td><td>~500</td><td>All React components</td></tr>
+    <tr><td>src/styles.css</td><td>~750</td><td>All styling</td></tr>
+    <tr><td>server/index.js</td><td>~140</td><td>All API routes</td></tr>
+    <tr><td>vite.config.js</td><td>11</td><td>Proxy configuration</td></tr>
+  </table>
+</div>
+
+</body>
+</html>
