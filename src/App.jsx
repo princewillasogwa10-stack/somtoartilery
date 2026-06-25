@@ -1,82 +1,50 @@
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState } from "react";
 
 const products = [
   {
-    name: "Abstract Lady",
-    material: "Oil on canvas",
-    price: "₦4,500,000",
-    category: "painting",
-    dimensions: "90 x 120 cm",
+    name: "Ascension Form",
+    material: "Patinated bronze",
+    price: "₦6,080,000",
+    category: "bronze",
+    dimensions: "94 x 38 x 31 cm",
     availability: "Available now",
-    image: "/assets/abstract-lady.jpg",
-    alt: "Abstract painting of a lady",
-    copy: "A vibrant abstract portrait with expressive brushwork and rich color composition."
+    image: "/assets/sculpture-bronze.svg",
+    alt: "Bronze abstract sculpture named Ascension Form",
+    copy: "A vertical study in balance with hand-finished dark green patina."
   },
   {
-    name: "Untitled Composition",
-    material: "Mixed media",
-    price: "₦3,800,000",
-    category: "painting",
-    dimensions: "73 x 111 cm",
-    availability: "Available now",
-    image: "/assets/art-7.jpg",
-    alt: "Abstract composition artwork",
-    copy: "A compelling mixed-media piece with layered textures and bold compositional elements."
+    name: "Quiet Arch",
+    material: "Carrara marble",
+    price: "₦8,320,000",
+    category: "stone",
+    dimensions: "72 x 58 x 22 cm",
+    availability: "Private viewing",
+    image: "/assets/sculpture-stone.svg",
+    alt: "Carved marble sculpture named Quiet Arch",
+    copy: "A smooth carved arch with negative space and polished inner edges."
   },
   {
-    name: "Abstract Study",
-    material: "Mixed media",
-    price: "₦3,200,000",
-    category: "painting",
-    dimensions: "60 x 80 cm",
-    availability: "Available now",
-    image: "/assets/art-6.jpg",
-    alt: "Abstract study artwork",
-    copy: "An evocative abstract study with dynamic form and nuanced color harmony."
-  },
-  {
-    name: "Dreamscape",
-    material: "Mixed media",
-    price: "₦3,600,000",
-    category: "painting",
-    dimensions: "70 x 90 cm",
-    availability: "Available now",
-    image: "/assets/art-5.jpg",
-    alt: "Dreamscape abstract artwork",
-    copy: "A dreamy abstract composition with flowing forms and a soft, atmospheric palette."
-  },
-  {
-    name: "United Series by Michael Amba",
-    material: "Mixed media",
-    price: "₦3,400,000",
-    category: "painting",
-    dimensions: "65 x 85 cm",
-    availability: "Available now",
-    image: "/assets/art-3.jpg",
-    alt: "Abstract artwork from untitled series",
-    copy: "A striking abstract piece with bold gestures and layered depth."
+    name: "Vessel Memory",
+    material: "Raku ceramic",
+    price: "₦2,320,000",
+    category: "ceramic",
+    dimensions: "46 x 29 x 27 cm",
+    availability: "Edition 2 of 8",
+    image: "/assets/sculpture-ceramic.svg",
+    alt: "Textured ceramic sculpture named Vessel Memory",
+    copy: "An expressive fired vessel form with ash glaze and raw clay texture."
   }
 ];
 
-const filters = ["all", "painting"];
+const filters = ["all", "bronze", "stone", "ceramic"];
 
-function Header({ inquiryCount, onOpenCart, user, onLogout }) {
+function Header({ inquiryCount, onOpenCart }) {
   const [navOpen, setNavOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState("");
-
-  useEffect(() => {
-    function onHashChange() {
-      setActiveSection(window.location.hash);
-    }
-    window.addEventListener("hashchange", onHashChange);
-    setActiveSection(window.location.hash);
-    return () => window.removeEventListener("hashchange", onHashChange);
-  }, []);
 
   return (
     <header className="site-header" aria-label="Main navigation">
-      <a className="brand" href="#top" aria-label="SOMTO ATELIER home">
-        <span>SOMTO ATELIER</span>
+      <a className="brand" href="#top" aria-label="Galleria Nazareth home">
+        <span>Galleria Nazareth</span>
       </a>
 
       <button
@@ -91,13 +59,13 @@ function Header({ inquiryCount, onOpenCart, user, onLogout }) {
       </button>
 
       <nav className={`nav-links ${navOpen ? "open" : ""}`} aria-label="Primary">
-        <a href="#collection" className={activeSection === "#collection" ? "active" : ""} onClick={() => setNavOpen(false)}>
+        <a href="#collection" onClick={() => setNavOpen(false)}>
           Collection
         </a>
-        <a href="#atelier" className={activeSection === "#atelier" ? "active" : ""} onClick={() => setNavOpen(false)}>
+        <a href="#atelier" onClick={() => setNavOpen(false)}>
           Atelier
         </a>
-        <a href="#visit" className={activeSection === "#visit" ? "active" : ""} onClick={() => setNavOpen(false)}>
+        <a href="#visit" onClick={() => setNavOpen(false)}>
           Visit
         </a>
         <button className="cart-button" type="button" onClick={onOpenCart} aria-label="Open inquiry bag">
@@ -107,15 +75,6 @@ function Header({ inquiryCount, onOpenCart, user, onLogout }) {
           <span>Inquiry</span>
           <span className="cart-count">{inquiryCount}</span>
         </button>
-        {user ? (
-          <button className="logout-link" type="button" onClick={() => { onLogout(); setNavOpen(false); }}>
-            Log out <strong>{user.name}</strong>
-          </button>
-        ) : (
-          <a href="#auth" className="auth-link" onClick={() => setNavOpen(false)}>
-            Sign in
-          </a>
-        )}
       </nav>
     </header>
   );
@@ -126,7 +85,7 @@ function Hero() {
     <section className="hero" aria-labelledby="hero-title">
       <div className="hero-copy">
         <p className="eyebrow">Original sculpture, curated with intention</p>
-        <h1 id="hero-title">SOMTO ATELIER</h1>
+        <h1 id="hero-title">Galleria Nazareth</h1>
         <p>
           A contemporary sculpture house for collectors seeking expressive stone, bronze, ceramic,
           and carved wood works with quiet presence.
@@ -151,7 +110,7 @@ function Hero() {
 
 function Intro() {
   return (
-    <section className="intro" aria-label="SOMTO ATELIER introduction">
+    <section className="intro" aria-label="Galleria Nazareth introduction">
       <p>
         We select sculptures with tactile weight, architectural form, and a sense of sacred
         stillness. Each piece is ready for homes, hotels, studios, and public interiors.
@@ -171,38 +130,15 @@ function Intro() {
   );
 }
 
-function Collection({ onAdd, user }) {
+function Collection({ onAdd }) {
   const [activeFilter, setActiveFilter] = useState("all");
-  const [lightbox, setLightbox] = useState(null);
   const visibleProducts = useMemo(() => {
     if (activeFilter === "all") return products;
     return products.filter((product) => product.category === activeFilter);
   }, [activeFilter]);
 
-  function closeLightbox() {
-    setLightbox(null);
-  }
-
   return (
     <section className="collection-section" id="collection" aria-labelledby="collection-title">
-      {lightbox && (
-        <div className="lightbox" onClick={closeLightbox}>
-          <div className="lightbox-content" onClick={(e) => e.stopPropagation()}>
-            <img src={lightbox.image} alt={lightbox.alt} />
-            <div className="lightbox-info">
-              <h3>{lightbox.name}</h3>
-              <p className="material">{lightbox.material}</p>
-              <p className="price">{lightbox.price}</p>
-              <p>{lightbox.copy}</p>
-              <dl className="product-details">
-                <div><dt>Dimensions</dt><dd>{lightbox.dimensions}</dd></div>
-                <div><dt>Status</dt><dd>{lightbox.availability}</dd></div>
-              </dl>
-            </div>
-            <button className="lightbox-close" onClick={closeLightbox}>x</button>
-          </div>
-        </div>
-      )}
       <div className="section-heading">
         <div>
           <p className="eyebrow">Current Collection</p>
@@ -225,7 +161,7 @@ function Collection({ onAdd, user }) {
       <div className="product-grid">
         {visibleProducts.map((product) => (
           <article className="product-card" key={product.name}>
-            <img src={product.image} alt={product.alt} onClick={() => setLightbox(product)} />
+            <img src={product.image} alt={product.alt} />
             <div className="product-info">
               <div>
                 <p className="material">{product.material}</p>
@@ -244,20 +180,14 @@ function Collection({ onAdd, user }) {
                 <dd>{product.availability}</dd>
               </div>
             </dl>
-            {user ? (
-              <button
-                className="button card-action"
-                type="button"
-                onClick={() => onAdd(product.name)}
-                aria-label={`Add ${product.name} to inquiry`}
-              >
-                Add to inquiry
-              </button>
-            ) : (
-              <a className="button card-action" href="#auth">
-                Sign in to add
-              </a>
-            )}
+            <button
+              className="button card-action"
+              type="button"
+              onClick={() => onAdd(product.name)}
+              aria-label={`Add ${product.name} to inquiry`}
+            >
+              Add to inquiry
+            </button>
           </article>
         ))}
       </div>
@@ -278,7 +208,7 @@ function Atelier() {
         <p className="eyebrow">The Atelier</p>
         <h2 id="atelier-title">A calm buying experience for serious art lovers</h2>
         <p>
-          SOMTO ATELIER works directly with sculptors and estates to source pieces with
+          Galleria Nazareth works directly with sculptors and estates to source pieces with
           provenance, installation guidance, and collector-ready documentation.
         </p>
       </div>
@@ -295,121 +225,17 @@ function Atelier() {
   );
 }
 
-function Auth({ onAuth }) {
-  const [mode, setMode] = useState("login");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  async function handleSubmit(event) {
-    event.preventDefault();
-    setLoading(true);
-    setError("");
-    const form = event.currentTarget;
-    const formData = new FormData(form);
-    const payload = {
-      email: formData.get("email"),
-      password: formData.get("password")
-    };
-    if (mode === "register") {
-      payload.name = formData.get("name");
-    }
-
-    try {
-      const res = await fetch(`/api/${mode}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
-      const data = await res.json();
-      if (res.ok) {
-        onAuth(data.token, data.user);
-      } else {
-        setError(data.error || "Something went wrong");
-      }
-    } catch {
-      setError("Unable to reach server. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  return (
-    <section className="auth-section" id="auth" aria-labelledby="auth-title">
-      <div className="auth-card">
-        <h2 id="auth-title">{mode === "login" ? "Sign in" : "Create account"}</h2>
-        <p className="eyebrow">
-          {mode === "login"
-            ? "Sign in to book a viewing or send an inquiry"
-            : "Register to book viewings and send inquiries"}
-        </p>
-        <form className="auth-form" onSubmit={handleSubmit}>
-          {mode === "register" && (
-            <label>
-              Name
-              <input type="text" name="name" placeholder="Your name" required />
-            </label>
-          )}
-          <label>
-            Email
-            <input type="email" name="email" placeholder="you@example.com" required />
-          </label>
-          <label>
-            Password
-            <input type="password" name="password" placeholder="At least 6 characters" minLength={6} required />
-          </label>
-          {error && <p className="form-status error">{error}</p>}
-          <button className="button primary" type="submit" disabled={loading}>
-            {loading ? "Please wait..." : mode === "login" ? "Sign in" : "Create account"}
-          </button>
-        </form>
-        <p className="auth-toggle">
-          {mode === "login" ? (
-            <>No account? <button type="button" className="link-button" onClick={() => { setMode("register"); setError(""); }}>Register here</button></>
-          ) : (
-            <>Already registered? <button type="button" className="link-button" onClick={() => { setMode("login"); setError(""); }}>Sign in</button></>
-          )}
-        </p>
-      </div>
-    </section>
-  );
-}
-
-function Visit({ inquiryItems, token }) {
+function Visit({ inquiryItems }) {
   const [status, setStatus] = useState("");
-  const [submitting, setSubmitting] = useState(false);
-  const selectedWorks = inquiryItems.length > 0 ? inquiryItems.map((i) => i.name).join(", ") : "";
+  const selectedWorks = inquiryItems.length > 0 ? inquiryItems.join(", ") : "";
 
-  async function handleSubmit(event) {
+  function handleSubmit(event) {
     event.preventDefault();
-    setSubmitting(true);
-    const form = event.currentTarget;
-    const formData = new FormData(form);
-    const payload = {
-      interest: formData.get("interest"),
-      works: formData.get("works")
-    };
-
-    try {
-      const res = await fetch("/api/inquiry", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify(payload)
-      });
-      if (res.ok) {
-        setStatus("Your interest has been sent.");
-        form.reset();
-      } else {
-        const data = await res.json();
-        setStatus(data.error || "Something went wrong. Please try again.");
-      }
-    } catch {
-      setStatus("Unable to reach server. Please try again later.");
-    } finally {
-      setSubmitting(false);
-    }
+    const formData = new FormData(event.currentTarget);
+    const works = formData.get("works");
+    const detail = works ? ` about ${works}` : "";
+    setStatus(`Thank you. Galleria Nazareth will reply with viewing details${detail} shortly.`);
+    event.currentTarget.reset();
   }
 
   return (
@@ -423,6 +249,14 @@ function Visit({ inquiryItems, token }) {
         </p>
       </div>
       <form className="contact-form" onSubmit={handleSubmit}>
+        <label>
+          Name
+          <input type="text" name="name" placeholder="Your name" required />
+        </label>
+        <label>
+          Email
+          <input type="email" name="email" placeholder="you@example.com" required />
+        </label>
         <label>
           Interest
           <select name="interest">
@@ -441,8 +275,8 @@ function Visit({ inquiryItems, token }) {
             rows="4"
           />
         </label>
-        <button className="button primary" type="submit" disabled={submitting}>
-          {submitting ? "Sending..." : "Request Appointment"}
+        <button className="button primary" type="submit">
+          Request Appointment
         </button>
         <p className="form-status" role="status" aria-live="polite">
           {status}
@@ -453,15 +287,6 @@ function Visit({ inquiryItems, token }) {
 }
 
 function InquiryBag({ items, open, onClose, onRemove }) {
-  const total = items.reduce((sum, item) => {
-    const num = parseFloat(item.price.replace(/[₦,]/g, ""));
-    return sum + num;
-  }, 0);
-
-  function formatPrice(amount) {
-    return "₦" + amount.toLocaleString();
-  }
-
   return (
     <>
       <aside className={`cart-panel ${open ? "open" : ""}`} aria-hidden={!open} aria-label="Inquiry bag">
@@ -476,31 +301,19 @@ function InquiryBag({ items, open, onClose, onRemove }) {
             <p className="empty-cart">No works added yet.</p>
           ) : (
             items.map((item) => (
-              <div className="cart-line" key={item.name}>
-                <div className="cart-line-info">
-                  <img className="cart-line-img" src={item.image} alt={item.name} />
-                  <div>
-                    <span className="cart-line-name">{item.name}</span>
-                    <span className="cart-line-price">{item.price}</span>
-                  </div>
-                </div>
-                <button type="button" onClick={() => onRemove(item.name)}>
+              <div className="cart-line" key={item}>
+                <span>{item}</span>
+                <button type="button" onClick={() => onRemove(item)}>
                   Remove
                 </button>
               </div>
             ))
           )}
         </div>
-        {items.length > 0 && (
-          <div className="cart-total">
-            <span>Total</span>
-            <span>{formatPrice(total)}</span>
-          </div>
-        )}
         <a className="button primary cart-cta" href="#visit" onClick={onClose}>
           Send Inquiry
         </a>
-      </aside>
+      </aside>``
       <button
         className={`scrim ${open ? "open" : ""}`}
         type="button"
@@ -514,58 +327,25 @@ function InquiryBag({ items, open, onClose, onRemove }) {
 export default function App() {
   const [inquiryItems, setInquiryItems] = useState([]);
   const [cartOpen, setCartOpen] = useState(false);
-  const [user, setUser] = useState(null);
-  const [token, setToken] = useState(null);
 
-  useEffect(() => {
-    const savedToken = localStorage.getItem("token");
-    const savedUser = localStorage.getItem("user");
-    if (savedToken && savedUser) {
-      setToken(savedToken);
-      setUser(JSON.parse(savedUser));
-    }
-  }, []);
-
-  function handleAuth(newToken, newUser) {
-    setToken(newToken);
-    setUser(newUser);
-    localStorage.setItem("token", newToken);
-    localStorage.setItem("user", JSON.stringify(newUser));
-  }
-
-  function handleLogout() {
-    setToken(null);
-    setUser(null);
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-  }
-
-  function addInquiryItem(productName) {
-    setInquiryItems((items) => {
-      if (items.find((i) => i.name === productName)) return items;
-      const product = products.find((p) => p.name === productName);
-      return product ? [...items, product] : items;
-    });
+  function addInquiryItem(item) {
+    setInquiryItems((items) => (items.includes(item) ? items : [...items, item]));
     setCartOpen(true);
   }
 
-  function removeInquiryItem(productName) {
-    setInquiryItems((items) => items.filter((item) => item.name !== productName));
+  function removeInquiryItem(item) {
+    setInquiryItems((items) => items.filter((currentItem) => currentItem !== item));
   }
 
   return (
     <>
-      <Header inquiryCount={inquiryItems.length} onOpenCart={() => setCartOpen(true)} user={user} onLogout={handleLogout} />
+      <Header inquiryCount={inquiryItems.length} onOpenCart={() => setCartOpen(true)} />
       <main id="top">
         <Hero />
         <Intro />
-        <Collection onAdd={addInquiryItem} user={user} />
+        <Collection onAdd={addInquiryItem} />
         <Atelier />
-        {user ? (
-          <Visit inquiryItems={inquiryItems} token={token} />
-        ) : (
-          <Auth onAuth={handleAuth} />
-        )}
+        <Visit inquiryItems={inquiryItems} />
       </main>
       <InquiryBag
         items={inquiryItems}
@@ -574,7 +354,7 @@ export default function App() {
         onRemove={removeInquiryItem}
       />
       <footer>
-        <p>SOMTO ATELIER</p>
+        <p>Galleria Nazareth</p>
         <p>Contemporary sculpture, collector services, and private viewings.</p>
       </footer>
     </>
