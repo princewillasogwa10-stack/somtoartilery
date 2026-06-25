@@ -44,6 +44,17 @@ const products = [
     image: "/assets/art-5.jpg",
     alt: "Dreamscape abstract artwork",
     copy: "A dreamy abstract composition with flowing forms and a soft, atmospheric palette."
+  },
+  {
+    name: "United Series by Michael Amba",
+    material: "Mixed media",
+    price: "₦3,400,000",
+    category: "painting",
+    dimensions: "65 x 85 cm",
+    availability: "Available now",
+    image: "/assets/art-3.jpg",
+    alt: "Abstract artwork from untitled series",
+    copy: "A striking abstract piece with bold gestures and layered depth."
   }
 ];
 
@@ -51,6 +62,16 @@ const filters = ["all", "painting"];
 
 function Header({ inquiryCount, onOpenCart, user, onLogout }) {
   const [navOpen, setNavOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState("");
+
+  useEffect(() => {
+    function onHashChange() {
+      setActiveSection(window.location.hash);
+    }
+    window.addEventListener("hashchange", onHashChange);
+    setActiveSection(window.location.hash);
+    return () => window.removeEventListener("hashchange", onHashChange);
+  }, []);
 
   return (
     <header className="site-header" aria-label="Main navigation">
@@ -70,13 +91,13 @@ function Header({ inquiryCount, onOpenCart, user, onLogout }) {
       </button>
 
       <nav className={`nav-links ${navOpen ? "open" : ""}`} aria-label="Primary">
-        <a href="#collection" onClick={() => setNavOpen(false)}>
+        <a href="#collection" className={activeSection === "#collection" ? "active" : ""} onClick={() => setNavOpen(false)}>
           Collection
         </a>
-        <a href="#atelier" onClick={() => setNavOpen(false)}>
+        <a href="#atelier" className={activeSection === "#atelier" ? "active" : ""} onClick={() => setNavOpen(false)}>
           Atelier
         </a>
-        <a href="#visit" onClick={() => setNavOpen(false)}>
+        <a href="#visit" className={activeSection === "#visit" ? "active" : ""} onClick={() => setNavOpen(false)}>
           Visit
         </a>
         <button className="cart-button" type="button" onClick={onOpenCart} aria-label="Open inquiry bag">
@@ -152,13 +173,36 @@ function Intro() {
 
 function Collection({ onAdd, user }) {
   const [activeFilter, setActiveFilter] = useState("all");
+  const [lightbox, setLightbox] = useState(null);
   const visibleProducts = useMemo(() => {
     if (activeFilter === "all") return products;
     return products.filter((product) => product.category === activeFilter);
   }, [activeFilter]);
 
+  function closeLightbox() {
+    setLightbox(null);
+  }
+
   return (
     <section className="collection-section" id="collection" aria-labelledby="collection-title">
+      {lightbox && (
+        <div className="lightbox" onClick={closeLightbox}>
+          <div className="lightbox-content" onClick={(e) => e.stopPropagation()}>
+            <img src={lightbox.image} alt={lightbox.alt} />
+            <div className="lightbox-info">
+              <h3>{lightbox.name}</h3>
+              <p className="material">{lightbox.material}</p>
+              <p className="price">{lightbox.price}</p>
+              <p>{lightbox.copy}</p>
+              <dl className="product-details">
+                <div><dt>Dimensions</dt><dd>{lightbox.dimensions}</dd></div>
+                <div><dt>Status</dt><dd>{lightbox.availability}</dd></div>
+              </dl>
+            </div>
+            <button className="lightbox-close" onClick={closeLightbox}>x</button>
+          </div>
+        </div>
+      )}
       <div className="section-heading">
         <div>
           <p className="eyebrow">Current Collection</p>
@@ -181,7 +225,7 @@ function Collection({ onAdd, user }) {
       <div className="product-grid">
         {visibleProducts.map((product) => (
           <article className="product-card" key={product.name}>
-            <img src={product.image} alt={product.alt} />
+            <img src={product.image} alt={product.alt} onClick={() => setLightbox(product)} />
             <div className="product-info">
               <div>
                 <p className="material">{product.material}</p>
