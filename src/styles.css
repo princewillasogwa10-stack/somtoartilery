@@ -38,16 +38,6 @@ body {
   background: var(--paper);
   color: var(--ink);
   font-family: var(--font-body);
-  transition: background 0.4s ease, color 0.4s ease;
-}
-
-body.dark-mode {
-  --ink: #f0ebe0;
-  --paper: #0f0f0f;
-  --chalk: #1a1a1a;
-  --muted: #9a948c;
-  --line: rgba(240, 235, 224, 0.12);
-  --shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
 }
 
 img {
@@ -1265,6 +1255,79 @@ footer p {
 .slider-container input[type="range"] {
   width: 100%;
   accent-color: var(--ink);
+}
+
+/* Dark Room Spotlight Mode */
+.collection-section.dark-room {
+  background: #080808 !important;
+  color: #fffaf2 !important;
+  transition: background 0.6s ease, color 0.6s ease;
+}
+
+.collection-section.dark-room .section-heading h2 {
+  color: #fffaf2;
+}
+
+.collection-section.dark-room .product-card {
+  background: #111111;
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+.collection-section.dark-room .product-info h3,
+.collection-section.dark-room .product-info .price,
+.collection-section.dark-room .product-details dd {
+  color: #fffaf2;
+}
+
+.collection-section.dark-room .product-details dt {
+  color: rgba(255,255,255,0.4);
+}
+
+.collection-section.dark-room .button.card-action {
+  border-color: #fffaf2;
+  color: #fffaf2;
+}
+
+.collection-section.dark-room .button.card-action:hover {
+  background: #fffaf2;
+  color: #080808;
+}
+
+.collection-section.dark-room .lightbox-info {
+  color: var(--ink);
+}
+
+.collection-section.dark-room .lightbox-info h3,
+.collection-section.dark-room .lightbox-info p,
+.collection-section.dark-room .lightbox-info .product-details dd {
+  color: var(--ink);
+}
+
+.collection-section.dark-room .lightbox-info .product-details dt {
+  color: var(--muted);
+}
+
+.dark-room-toggle-btn {
+  transition: all 0.3s ease;
+}
+
+.dark-room-toggle-btn.active {
+  background: #fffaf2 !important;
+  color: #080808 !important;
+  border-color: #fffaf2 !important;
+  box-shadow: 0 0 15px rgba(255,255,255,0.3);
+}
+
+.dark-room-overlay {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: #080808;
+  pointer-events: none;
+  z-index: 2;
+  mix-blend-mode: multiply;
+  opacity: 0.94;
+  mask-image: radial-gradient(circle 400px at var(--grid-mouse-x, -500px) var(--grid-mouse-y, -500px), transparent 10%, black 85%);
+  -webkit-mask-image: radial-gradient(circle 400px at var(--grid-mouse-x, -500px) var(--grid-mouse-y, -500px), transparent 10%, black 85%);
 }
 
 /* Ambient sound waves indicator styling */

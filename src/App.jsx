@@ -90,7 +90,7 @@ const products = [
 
 const filters = ["all", "painting"];
 
-function Header({ inquiryCount, onOpenCart, user, onLogout, isAdminActive, onToggleAdmin, ambientPlaying, onToggleAmbient, darkMode, onToggleDarkMode }) {
+function Header({ inquiryCount, onOpenCart, user, onLogout, isAdminActive, onToggleAdmin, ambientPlaying, onToggleAmbient }) {
   const [navOpen, setNavOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("");
 
@@ -177,25 +177,6 @@ function Header({ inquiryCount, onOpenCart, user, onLogout, isAdminActive, onTog
               <span className="bar" />
             </span>
             <span>{ambientPlaying ? "Mute" : "Gibran_Alcocer_-_Idea_10_(mp3.pm).mp3"}</span>
-          </button>
-        )}
-        {!isAdminActive && (
-          <button
-            className="theme-toggle-btn"
-            type="button"
-            onClick={onToggleDarkMode}
-            title="Toggle dark/light mode"
-            style={{
-              background: "none",
-              border: "1px solid var(--line)",
-              cursor: "pointer",
-              padding: "8px 12px",
-              fontSize: "0.85rem",
-              fontWeight: "600",
-              color: "var(--muted)"
-            }}
-          >
-            {darkMode ? "☀️ Light" : "🌙 Dark"}
           </button>
         )}
         {!isAdminActive && (
@@ -628,6 +609,8 @@ function VirtualStudio() {
 function Collection({ onAdd, user }) {
   const [activeFilter, setActiveFilter] = useState("all");
   const [lightbox, setLightbox] = useState(null);
+  const [darkRoom, setDarkRoom] = useState(false);
+  const gridRef = useRef(null);
 
   const visibleProducts = useMemo(() => {
     if (activeFilter === "all") return products;
@@ -666,8 +649,25 @@ function Collection({ onAdd, user }) {
     }
   };
 
+  const handleMouseMove = (e) => {
+    if (!darkRoom || !gridRef.current) return;
+    const rect = gridRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    gridRef.current.style.setProperty("--grid-mouse-x", `${x}px`);
+    gridRef.current.style.setProperty("--grid-mouse-y", `${y}px`);
+  };
+
+  const toggleDarkRoom = () => {
+    if (document.startViewTransition) {
+      document.startViewTransition(() => setDarkRoom(!darkRoom));
+    } else {
+      setDarkRoom(!darkRoom);
+    }
+  };
+
   return (
-    <section className="collection-section" id="collection" aria-labelledby="collection-title">
+    <section className={`collection-section ${darkRoom ? "dark-room" : ""}`} id="collection" aria-labelledby="collection-title">
       {lightbox && (
         <div className="lightbox" onClick={closeLightbox}>
           <div className="lightbox-content" onClick={(e) => e.stopPropagation()}>
@@ -696,6 +696,23 @@ function Collection({ onAdd, user }) {
           <h2 id="collection-title">Sculptures for considered spaces</h2>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "20px", flexWrap: "wrap" }}>
+          <button 
+            type="button" 
+            className={`dark-room-toggle-btn ${darkRoom ? "active" : ""}`}
+            onClick={toggleDarkRoom}
+            style={{
+              background: "none",
+              border: "1px solid var(--line)",
+              cursor: "pointer",
+              padding: "8px 16px",
+              fontSize: "0.85rem",
+              fontWeight: "600",
+              textTransform: "uppercase",
+              letterSpacing: "0.05em"
+            }}
+          >
+            {darkRoom ? "☀️ Light Mode" : "🌙 Dark Room"}
+          </button>
           <div className="filter-tabs" role="tablist" aria-label="Filter sculptures">
             {filters.map((filter) => (
               <button
@@ -711,7 +728,13 @@ function Collection({ onAdd, user }) {
         </div>
       </div>
 
-      <div className="product-grid-container" style={{ position: "relative" }}>
+      <div 
+        className="product-grid-container" 
+        ref={gridRef}
+        onMouseMove={handleMouseMove}
+        style={{ position: "relative" }}
+      >
+        {darkRoom && <div className="dark-room-overlay" />}
         <div className="product-grid">
           {visibleProducts.map((product) => (
             <article className="product-card spotlight-hover" key={product.name}>
@@ -1148,7 +1171,6 @@ export default function App() {
   const [token, setToken] = useState(null);
   const [isAdminActive, setIsAdminActiveState] = useState(false);
   const [ambientPlaying, setAmbientPlaying] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
 
   const synthRef = useRef(null);
 
@@ -1163,14 +1185,6 @@ export default function App() {
 
   const setCartOpen = (val) => withTransition(() => setCartOpenState(val));
   const setIsAdminActive = (val) => withTransition(() => setIsAdminActiveState(val));
-
-  const toggleDarkMode = () => {
-    withTransition(() => setDarkMode((prev) => !prev));
-  };
-
-  useEffect(() => {
-    document.body.classList.toggle("dark-mode", darkMode);
-  }, [darkMode]);
 
   // Toggle ambient soundscape
   const toggleAmbient = () => {
@@ -1257,8 +1271,6 @@ export default function App() {
         onToggleAdmin={setIsAdminActive}
         ambientPlaying={ambientPlaying}
         onToggleAmbient={toggleAmbient}
-        darkMode={darkMode}
-        onToggleDarkMode={toggleDarkMode}
       />
       <main id="top">
         {isAdminActive ? (
