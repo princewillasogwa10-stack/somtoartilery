@@ -12,7 +12,8 @@ class AmbientSynth {
       this.audio = new Audio("/Gibran_Alcocer_-_Idea_10_(mp3.pm).mp3");
       this.audio.loop = true;
       this.audio.volume = 0.5;
-      this.audio.play();
+      this.audio.onerror = () => console.error("Ambient Audio error:", this.audio.error);
+      this.audio.play().catch(e => console.error("Ambient Audio play failed:", e));
       this.playing = true;
     } catch (e) {
       console.error("Failed to start Ambient Audio: ", e);
