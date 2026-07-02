@@ -156,7 +156,7 @@ async function sendEmailNotification(entry) {
       to: TO_EMAIL,
       subject: `New inquiry from ${entry.name}`,
       text: `Name: ${entry.name}\nEmail: ${entry.email}\nInterest: ${entry.interest}\nWorks: ${entry.works}\n\nSubmitted: ${entry.createdAt}`,
-      replyTo: entry.email
+      reply_to: entry.email
     });
   } catch (err) {
     console.error('Email send failed:', err.message);
