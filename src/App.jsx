@@ -972,7 +972,7 @@ function Visit({ inquiryItems, token }) {
   );
 }
 
-function InquiryBag({ items, open, onClose, onRemove, onOpenCurator }) {
+function InquiryBag({ items, open, onClose, onRemove }) {
   const total = items.reduce((sum, item) => {
     const num = parseFloat(item.price.replace(/[₦,]/g, ""));
     return sum + num;
@@ -1016,16 +1016,6 @@ function InquiryBag({ items, open, onClose, onRemove, onOpenCurator }) {
             <span>Total</span>
             <span>{formatPrice(total)}</span>
           </div>
-        )}
-        {items.length > 0 && (
-          <button
-            type="button"
-            className="button secondary curator-canvas-cta"
-            onClick={() => { onOpenCurator(); onClose(); }}
-            style={{ width: "100%", marginBottom: "12px", border: "1px solid var(--ink)" }}
-          >
-            Curate in Gallery Room
-          </button>
         )}
         <a className="button primary cart-cta" href="#visit" onClick={onClose}>
           Send Inquiry
@@ -1174,177 +1164,12 @@ function AdminDashboard({ token, onClose }) {
   );
 }
 
-function CuratorCanvas({ inquiryItems, onClose }) {
-  const [positions, setPositions] = useState({});
-  const [scales, setScales] = useState({});
-  const [draggingItem, setDraggingItem] = useState(null);
-  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
-
-  useEffect(() => {
-    const initialPos = {};
-    const initialScales = {};
-    inquiryItems.forEach((item, index) => {
-      const left = 15 + (index * 25) % 70;
-      const top = 25 + (index * 8) % 25;
-      initialPos[item.name] = { x: left, top: top };
-      initialScales[item.name] = 1.0;
-    });
-    setPositions(initialPos);
-    setScales(initialScales);
-  }, [inquiryItems]);
-
-  const handlePointerDown = (e, itemName) => {
-    e.preventDefault();
-    const rect = e.currentTarget.getBoundingClientRect();
-    setDraggingItem(itemName);
-    setDragOffset({
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top
-    });
-  };
-
-  const handlePointerMove = (e) => {
-    if (!draggingItem) return;
-    const workspace = document.getElementById("curator-workspace-area");
-    const rect = workspace.getBoundingClientRect();
-
-    const leftPercent = ((e.clientX - rect.left - dragOffset.x) / rect.width) * 100;
-    const topPercent = ((e.clientY - rect.top - dragOffset.y) / rect.height) * 100;
-
-    setPositions((prev) => ({
-      ...prev,
-      [draggingItem]: {
-        x: Math.max(0, Math.min(88, leftPercent)),
-        top: Math.max(0, Math.min(75, topPercent))
-      }
-    }));
-  };
-
-  const handlePointerUp = () => {
-    setDraggingItem(null);
-  };
-
-  const handleScaleChange = (itemName, value) => {
-    setScales((prev) => ({
-      ...prev,
-      [itemName]: parseFloat(value)
-    }));
-  };
-
-  return (
-    <section className="curator-canvas-page">
-      <div className="curator-header">
-        <h2>Curator's Canvas</h2>
-        <button type="button" className="button primary" onClick={onClose}>
-          Close Canvas
-        </button>
-      </div>
-
-      <div
-        id="curator-workspace-area"
-        className="curator-workspace"
-        onPointerMove={handlePointerMove}
-        onPointerUp={handlePointerUp}
-      >
-        <div className="curator-instructions-box">
-          <h3>Interactive Curator Space</h3>
-          <p>Drag and drop your selected artworks onto the virtual pedestals below. Adjust the scale slider to visualize how the pieces compare in size.</p>
-        </div>
-
-        <div className="gallery-wall">
-          <div className="wall-spotlight" style={{ left: "20%" }} />
-          <div className="wall-spotlight" style={{ left: "50%" }} />
-          <div className="wall-spotlight" style={{ left: "80%" }} />
-          {inquiryItems.length === 0 ? (
-            <div className="curator-empty">
-              <h3>Your Inquiry Bag is Empty</h3>
-              <p>Add artworks from the collection first, then use this canvas to arrange and curate them in this virtual room.</p>
-              <button type="button" className="button secondary" onClick={onClose}>Go to Collection</button>
-            </div>
-          ) : (
-            inquiryItems.map((item) => {
-              const pos = positions[item.name] || { x: 50, top: 30 };
-              const scale = scales[item.name] || 1.0;
-              return (
-                <div
-                  key={item.name}
-                  className={`draggable-artwork ${draggingItem === item.name ? "dragging" : ""}`}
-                  onPointerDown={(e) => handlePointerDown(e, item.name)}
-                  style={{
-                    left: `${pos.x}%`,
-                    top: `${pos.top}%`,
-                    transform: `scale(${scale})`,
-                    zIndex: draggingItem === item.name ? 100 : 5
-                  }}
-                >
-                  <img src={item.image} alt={item.alt} />
-                  <div className="artwork-meta-tag">
-                    <h4>{item.name}</h4>
-                    <p>{item.dimensions}</p>
-                  </div>
-                </div>
-              );
-            })
-          )}
-        </div>
-
-        <div className="gallery-floor">
-          <div className="floor-reflection" />
-          <div className="virtual-plinth-container">
-            <div className="virtual-plinth">
-              <div className="plinth-3d-box">
-                <div className="plinth-face plinth-top" />
-                <div className="plinth-face plinth-front" />
-                <div className="plinth-face plinth-left" />
-              </div>
-              <span className="plinth-label">Pedestal I</span>
-            </div>
-            <div className="virtual-plinth">
-              <div className="plinth-3d-box">
-                <div className="plinth-face plinth-top" />
-                <div className="plinth-face plinth-front" />
-                <div className="plinth-face plinth-left" />
-              </div>
-              <span className="plinth-label">Pedestal II</span>
-            </div>
-            <div className="virtual-plinth">
-              <div className="plinth-3d-box">
-                <div className="plinth-face plinth-top" />
-                <div className="plinth-face plinth-front" />
-                <div className="plinth-face plinth-left" />
-              </div>
-              <span className="plinth-label">Pedestal III</span>
-            </div>
-          </div>
-        </div>
-
-        {inquiryItems.length > 0 && draggingItem && (
-          <div className="canvas-controls-overlay">
-            <label htmlFor="scale-slider">Scale {draggingItem}:</label>
-            <input
-              id="scale-slider"
-              type="range"
-              min="0.5"
-              max="1.5"
-              step="0.1"
-              value={scales[draggingItem] || 1.0}
-              onChange={(e) => handleScaleChange(draggingItem, e.target.value)}
-            />
-            <span>{Math.round((scales[draggingItem] || 1.0) * 100)}%</span>
-          </div>
-        )}
-      </div>
-    </section>
-  );
-}
-
 export default function App() {
   const [inquiryItems, setInquiryItems] = useState([]);
   const [cartOpen, setCartOpenState] = useState(false);
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
   const [isAdminActive, setIsAdminActiveState] = useState(false);
-  const [isCuratorActive, setIsCuratorActiveState] = useState(false);
   const [ambientPlaying, setAmbientPlaying] = useState(false);
 
   const synthRef = useRef(null);
@@ -1360,7 +1185,6 @@ export default function App() {
 
   const setCartOpen = (val) => withTransition(() => setCartOpenState(val));
   const setIsAdminActive = (val) => withTransition(() => setIsAdminActiveState(val));
-  const setIsCuratorActive = (val) => withTransition(() => setIsCuratorActiveState(val));
 
   // Toggle ambient soundscape
   const toggleAmbient = () => {
@@ -1414,7 +1238,6 @@ export default function App() {
       setToken(null);
       setUser(null);
       setIsAdminActiveState(false);
-      setIsCuratorActiveState(false);
       localStorage.removeItem("token");
       localStorage.removeItem("user");
     });
@@ -1452,8 +1275,6 @@ export default function App() {
       <main id="top">
         {isAdminActive ? (
           <AdminDashboard token={token} onClose={() => setIsAdminActive(false)} />
-        ) : isCuratorActive ? (
-          <CuratorCanvas inquiryItems={inquiryItems} onClose={() => setIsCuratorActive(false)} />
         ) : (
           <>
             <Hero />
@@ -1469,13 +1290,12 @@ export default function App() {
           </>
         )}
       </main>
-      {!isAdminActive && !isCuratorActive && (
+      {!isAdminActive && (
         <InquiryBag
           items={inquiryItems}
           open={cartOpen}
           onClose={() => setCartOpen(false)}
           onRemove={removeInquiryItem}
-          onOpenCurator={() => setIsCuratorActive(true)}
         />
       )}
       <footer>
