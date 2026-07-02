@@ -87,8 +87,10 @@ textarea {
 
 .brand {
   gap: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
+  font-weight: 400;
+  font-family: 'UnifrakturMaguntia', cursive;
+  font-size: 1.4rem;
+  text-transform: none;
 }
 
 .nav-links {
