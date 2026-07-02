@@ -194,6 +194,54 @@ function Intro() {
     </section>
   );
 }
+function AudioGuide({ text }) {
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  useEffect(() => {
+    return () => {
+      window.speechSynthesis.cancel();
+    };
+  }, []);
+
+  const toggleSpeech = () => {
+    if (isPlaying) {
+      window.speechSynthesis.cancel();
+      setIsPlaying(false);
+    } else {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = 0.85;
+      utterance.pitch = 0.95;
+      utterance.onend = () => setIsPlaying(false);
+      utterance.onerror = () => setIsPlaying(false);
+
+      const voices = window.speechSynthesis.getVoices();
+      const voice = voices.find(
+        (v) => v.lang.startsWith("en") && (v.name.includes("Google") || v.name.includes("Natural"))
+      ) || voices.find((v) => v.lang.startsWith("en"));
+      if (voice) utterance.voice = voice;
+
+      setIsPlaying(true);
+      window.speechSynthesis.speak(utterance);
+    }
+  };
+
+  return (
+    <div className="audio-guide-container">
+      <button
+        type="button"
+        className={`audio-guide-btn ${isPlaying ? "playing" : ""}`}
+        onClick={toggleSpeech}
+        title="Listen to Artwork Description"
+      >
+        <span className="wave-bar" />
+        <span className="wave-bar" />
+        <span className="wave-bar" />
+        <span>{isPlaying ? "Mute Guide" : "Listen to Guide"}</span>
+      </button>
+    </div>
+  );
+}
 
 function Collection({ onAdd, user }) {
   const [activeFilter, setActiveFilter] = useState("all");
@@ -248,7 +296,7 @@ function Collection({ onAdd, user }) {
 
       <div className="product-grid">
         {visibleProducts.map((product) => (
-          <article className="product-card" key={product.name}>
+          <article className="product-card spotlight-hover" key={product.name}>
             <img src={product.image} alt={product.alt} onClick={() => setLightbox(product)} />
             <div className="product-info">
               <div>
@@ -268,6 +316,7 @@ function Collection({ onAdd, user }) {
                 <dd>{product.availability}</dd>
               </div>
             </dl>
+            <AudioGuide text={`${product.name}. A ${product.material} sculpture. Measuring ${product.dimensions}. ${product.copy}`} />
             {user ? (
               <button
                 className="button card-action"
@@ -476,7 +525,7 @@ function Visit({ inquiryItems, token }) {
   );
 }
 
-function InquiryBag({ items, open, onClose, onRemove }) {
+function InquiryBag({ items, open, onClose, onRemove, onOpenCurator }) {
   const total = items.reduce((sum, item) => {
     const num = parseFloat(item.price.replace(/[₦,]/g, ""));
     return sum + num;
@@ -520,6 +569,16 @@ function InquiryBag({ items, open, onClose, onRemove }) {
             <span>Total</span>
             <span>{formatPrice(total)}</span>
           </div>
+        )}
+        {items.length > 0 && (
+          <button
+            type="button"
+            className="button secondary curator-canvas-cta"
+            onClick={() => { onOpenCurator(); onClose(); }}
+            style={{ width: "100%", marginBottom: "12px", border: "1px solid var(--ink)" }}
+          >
+            Curate in Gallery Room
+          </button>
         )}
         <a className="button primary cart-cta" href="#visit" onClick={onClose}>
           Send Inquiry
@@ -668,12 +727,160 @@ function AdminDashboard({ token, onClose }) {
   );
 }
 
+function CuratorCanvas({ inquiryItems, onClose }) {
+  const [positions, setPositions] = useState({});
+  const [scales, setScales] = useState({});
+  const [draggingItem, setDraggingItem] = useState(null);
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const initialPos = {};
+    const initialScales = {};
+    inquiryItems.forEach((item, index) => {
+      const left = 15 + (index * 25) % 70;
+      const top = 30 + (index * 10) % 30;
+      initialPos[item.name] = { x: left, top: top };
+      initialScales[item.name] = 1.0;
+    });
+    setPositions(initialPos);
+    setScales(initialScales);
+  }, [inquiryItems]);
+
+  const handlePointerDown = (e, itemName) => {
+    e.preventDefault();
+    const rect = e.currentTarget.getBoundingClientRect();
+    setDraggingItem(itemName);
+    setDragOffset({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top
+    });
+  };
+
+  const handlePointerMove = (e) => {
+    if (!draggingItem) return;
+    const workspace = document.getElementById("curator-workspace-area");
+    const rect = workspace.getBoundingClientRect();
+
+    const leftPercent = ((e.clientX - rect.left - dragOffset.x) / rect.width) * 100;
+    const topPercent = ((e.clientY - rect.top - dragOffset.y) / rect.height) * 100;
+
+    setPositions((prev) => ({
+      ...prev,
+      [draggingItem]: {
+        x: Math.max(0, Math.min(85, leftPercent)),
+        top: Math.max(0, Math.min(80, topPercent))
+      }
+    }));
+  };
+
+  const handlePointerUp = () => {
+    setDraggingItem(null);
+  };
+
+  const handleScaleChange = (itemName, value) => {
+    setScales((prev) => ({
+      ...prev,
+      [itemName]: parseFloat(value)
+    }));
+  };
+
+  return (
+    <section className="curator-canvas-page">
+      <div className="curator-header">
+        <h2>Curator's Canvas</h2>
+        <button type="button" className="button primary" onClick={onClose}>
+          Close Canvas
+        </button>
+      </div>
+
+      <div
+        id="curator-workspace-area"
+        className="curator-workspace"
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+      >
+        <div className="curator-instructions-box">
+          <h3>Interactive Curator Space</h3>
+          <p>Drag and drop your selected artworks onto the virtual pedestals below. Adjust the scale slider to visualize how the pieces compare in size.</p>
+        </div>
+
+        <div className="gallery-wall">
+          {inquiryItems.length === 0 ? (
+            <div className="curator-empty">
+              <h3>Your Inquiry Bag is Empty</h3>
+              <p>Add artworks from the collection first, then use this canvas to arrange and curate them in this virtual room.</p>
+              <button type="button" className="button secondary" onClick={onClose}>Go to Collection</button>
+            </div>
+          ) : (
+            inquiryItems.map((item) => {
+              const pos = positions[item.name] || { x: 50, top: 40 };
+              const scale = scales[item.name] || 1.0;
+              return (
+                <div
+                  key={item.name}
+                  className="draggable-artwork"
+                  onPointerDown={(e) => handlePointerDown(e, item.name)}
+                  style={{
+                    left: `${pos.x}%`,
+                    top: `${pos.top}%`,
+                    transform: `scale(${scale})`,
+                    zIndex: draggingItem === item.name ? 100 : 5
+                  }}
+                >
+                  <img src={item.image} alt={item.alt} />
+                  <h4>{item.name}</h4>
+                  <p>{item.dimensions}</p>
+                </div>
+              );
+            })
+          )}
+        </div>
+
+        <div className="gallery-floor">
+          <div className="virtual-plinth-container">
+            <div className="virtual-plinth"><span className="plinth-label">Plinth Alpha</span></div>
+            <div className="virtual-plinth"><span className="plinth-label">Plinth Beta</span></div>
+            <div className="virtual-plinth"><span className="plinth-label">Plinth Gamma</span></div>
+          </div>
+        </div>
+
+        {inquiryItems.length > 0 && draggingItem && (
+          <div className="canvas-controls-overlay">
+            <label htmlFor="scale-slider">Scale {draggingItem}:</label>
+            <input
+              id="scale-slider"
+              type="range"
+              min="0.5"
+              max="1.5"
+              step="0.1"
+              value={scales[draggingItem] || 1.0}
+              onChange={(e) => handleScaleChange(draggingItem, e.target.value)}
+            />
+            <span>{Math.round((scales[draggingItem] || 1.0) * 100)}%</span>
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
 export default function App() {
   const [inquiryItems, setInquiryItems] = useState([]);
   const [cartOpen, setCartOpen] = useState(false);
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
   const [isAdminActive, setIsAdminActive] = useState(false);
+  const [isCuratorActive, setIsCuratorActive] = useState(false);
+
+  // Global mouse coordinates listener for spotlight effect
+  useEffect(() => {
+    const handleMove = (e) => {
+      document.documentElement.style.setProperty("--mouse-x", `${e.clientX}px`);
+      document.documentElement.style.setProperty("--mouse-y", `${e.clientY}px`);
+    };
+    window.addEventListener("mousemove", handleMove);
+    return () => window.removeEventListener("mousemove", handleMove);
+  }, []);
 
   useEffect(() => {
     const savedToken = localStorage.getItem("token");
@@ -695,6 +902,7 @@ export default function App() {
     setToken(null);
     setUser(null);
     setIsAdminActive(false);
+    setIsCuratorActive(false);
     localStorage.removeItem("token");
     localStorage.removeItem("user");
   }
@@ -725,6 +933,8 @@ export default function App() {
       <main id="top">
         {isAdminActive ? (
           <AdminDashboard token={token} onClose={() => setIsAdminActive(false)} />
+        ) : isCuratorActive ? (
+          <CuratorCanvas inquiryItems={inquiryItems} onClose={() => setIsCuratorActive(false)} />
         ) : (
           <>
             <Hero />
@@ -739,12 +949,13 @@ export default function App() {
           </>
         )}
       </main>
-      {!isAdminActive && (
+      {!isAdminActive && !isCuratorActive && (
         <InquiryBag
           items={inquiryItems}
           open={cartOpen}
           onClose={() => setCartOpen(false)}
           onRemove={removeInquiryItem}
+          onOpenCurator={() => setIsCuratorActive(true)}
         />
       )}
       <footer>
