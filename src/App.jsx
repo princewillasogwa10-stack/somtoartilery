@@ -261,29 +261,37 @@ function AudioGuide({ text }) {
     };
   }, []);
 
+  const speak = (text) => {
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = 0.7;
+    utterance.pitch = 0.3;
+    utterance.onend = () => setIsPlaying(false);
+    utterance.onerror = () => setIsPlaying(false);
+
+    const voices = window.speechSynthesis.getVoices();
+    const maleVoice = voices.find(
+      (v) => v.lang.startsWith("en") && v.name !== "Samantha" && !v.name.toLowerCase().includes("female")
+    ) || voices.find((v) => v.lang.startsWith("en"));
+    if (maleVoice) utterance.voice = maleVoice;
+
+    setIsPlaying(true);
+    window.speechSynthesis.speak(utterance);
+  };
+
   const toggleSpeech = () => {
+    window.speechSynthesis.cancel();
     if (isPlaying) {
-      window.speechSynthesis.cancel();
       setIsPlaying(false);
     } else {
-      window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.rate = 0.85;
-      utterance.pitch = 0.4;
-      utterance.onend = () => setIsPlaying(false);
-      utterance.onerror = () => setIsPlaying(false);
-
       const voices = window.speechSynthesis.getVoices();
-      const maleNames = ["Alex", "Daniel", "Aaron", "Fred", "Tom", "Arthur", "Bruce", "James", "Mike", "Richard"];
-      const voice = voices.find(
-        (v) => v.lang.startsWith("en") && maleNames.some(n => v.name.includes(n)) && !v.name.toLowerCase().includes("female")
-      ) || voices.find(
-        (v) => v.lang.startsWith("en") && (v.name.includes("Google") || v.name.includes("Natural"))
-      ) || voices.find((v) => v.lang.startsWith("en"));
-      if (voice) utterance.voice = voice;
-
-      setIsPlaying(true);
-      window.speechSynthesis.speak(utterance);
+      if (voices.length === 0) {
+        window.speechSynthesis.onvoiceschanged = () => {
+          window.speechSynthesis.onvoiceschanged = null;
+          speak(text);
+        };
+      } else {
+        speak(text);
+      }
     }
   };
 
