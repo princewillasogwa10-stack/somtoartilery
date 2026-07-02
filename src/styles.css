@@ -155,7 +155,7 @@ textarea {
     linear-gradient(90deg, rgba(31, 92, 74, 0.12) 1px, transparent 1px),
     linear-gradient(0deg, rgba(31, 92, 74, 0.1) 1px, transparent 1px);
   background-size: auto, 72px 72px, 72px 72px;
-  grid-template-columns: minmax(0, 1fr);
+  grid-template-columns: 1fr 1fr;
   min-height: calc(100vh - 68px);
   position: relative;
 }
@@ -247,6 +247,57 @@ h3 {
 .button.card-action {
   background: transparent;
   color: var(--ink);
+}
+
+.hero-slideshow {
+  position: relative;
+  overflow: hidden;
+  align-self: center;
+  justify-self: end;
+  width: 100%;
+  height: 70%;
+  max-height: 600px;
+  margin-right: clamp(18px, 4vw, 56px);
+  border-radius: 4px;
+  background: var(--stone);
+}
+
+.hero-slideshow img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+
+.hero-slideshow img.active {
+  opacity: 1;
+}
+
+.hero-slide-dots {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+}
+
+.hero-slide-dots button {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 0;
+  background: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.3s ease;
+}
+
+.hero-slide-dots button.active {
+  background: #fff;
 }
 
 .hero-notes {

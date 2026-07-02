@@ -204,6 +204,15 @@ function Header({ inquiryCount, onOpenCart, user, onLogout, isAdminActive, onTog
 
 
 function Hero() {
+  const [slide, setSlide] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setSlide((s) => (s + 1) % products.length);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, []);
+
   return (
     <section className="hero" aria-labelledby="hero-title">
       <div className="hero-copy">
@@ -220,6 +229,26 @@ function Hero() {
           <a className="button secondary" href="#auth">
             Book Viewing
           </a>
+        </div>
+      </div>
+      <div className="hero-slideshow" aria-label="Featured artworks">
+        {products.map((product, i) => (
+          <img
+            key={product.name}
+            src={product.image}
+            alt={product.alt}
+            className={i === slide ? "active" : ""}
+          />
+        ))}
+        <div className="hero-slide-dots">
+          {products.map((_, i) => (
+            <button
+              key={i}
+              className={i === slide ? "active" : ""}
+              onClick={() => setSlide(i)}
+              aria-label={`Show ${products[i].name}`}
+            />
+          ))}
         </div>
       </div>
       <div className="hero-notes" aria-label="Gallery highlights">
