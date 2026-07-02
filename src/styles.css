@@ -193,12 +193,6 @@ h1 {
   max-width: 720px;
 }
 
-#hero-title {
-  font-family: 'UnifrakturMaguntia', cursive;
-  font-weight: 400;
-  text-transform: none;
-}
-
 h2 {
   font-size: clamp(2.3rem, 5vw, 5rem);
 }
@@ -702,10 +696,8 @@ footer {
 
 footer p:first-child {
   color: var(--ink);
-  font-weight: 400;
-  font-family: 'UnifrakturMaguntia', cursive;
-  text-transform: none;
-  font-size: 1.2rem;
+  font-weight: 900;
+  text-transform: uppercase;
 }
 
 footer p {
