@@ -5,5 +5,12 @@
     "email": "somtoasogwa10@gmail.com",
     "password": "$2b$10$d4RoVokyn6mDc08j8fCRne.oo/XpbpeODi6/t8awxgGNX.hX1lsxG",
     "createdAt": "2026-06-24T22:03:32.782Z"
+  },
+  {
+    "id": 1783030710252,
+    "name": "Test User",
+    "email": "test@test.com",
+    "password": "$2b$10$SFBWSnEwuEmtkH1yw.Oum.OlQbOeV5EAu0xC3v571yxStNHl3daNW",
+    "createdAt": "2026-07-02T22:18:30.252Z"
   }
 ]

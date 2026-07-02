@@ -16,5 +16,14 @@
     "interest": "Private viewing",
     "works": "work with you actively \n",
     "createdAt": "2026-07-02T08:59:39.153Z"
+  },
+  {
+    "id": 1783030710267,
+    "type": "inquiry",
+    "name": "Test User",
+    "email": "test@test.com",
+    "interest": "Artwork inquiry",
+    "works": "Abstract Lady, Dreamscape",
+    "createdAt": "2026-07-02T22:18:30.267Z"
   }
 ]

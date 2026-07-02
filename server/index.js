@@ -52,6 +52,9 @@ for (const file of [USERS_FILE, SUBMISSIONS_FILE]) {
 const JWT_SECRET = process.env.JWT_SECRET || 'galleria-nazareth-secret-key';
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 const TO_EMAIL = process.env.TO_EMAIL || 'princewillasogwa10@gmail.com';
+console.log('[EMAIL] RESEND_API_KEY present:', !!process.env.RESEND_API_KEY);
+console.log('[EMAIL] resend client initialized:', !!resend);
+console.log('[EMAIL] TO_EMAIL:', TO_EMAIL);
 
 const app = express();
 app.use(cors());
@@ -149,17 +152,23 @@ app.get('/api/users', (req, res) => {
 });
 
 async function sendEmailNotification(entry) {
-  if (!resend) return;
+  console.log('[EMAIL] sendEmailNotification called for:', entry.name);
+  if (!resend) {
+    console.error('[EMAIL] Resend client is NULL — RESEND_API_KEY missing');
+    return;
+  }
   try {
-    await resend.emails.send({
+    const result = await resend.emails.send({
       from: 'SOMTO ATELIER <onboarding@resend.dev>',
       to: TO_EMAIL,
       subject: `New inquiry from ${entry.name}`,
       text: `Name: ${entry.name}\nEmail: ${entry.email}\nInterest: ${entry.interest}\nWorks: ${entry.works}\n\nSubmitted: ${entry.createdAt}`,
       reply_to: entry.email
     });
+    console.log('[EMAIL] Send result:', JSON.stringify(result));
   } catch (err) {
-    console.error('Email send failed:', err.message);
+    console.error('[EMAIL] Send failed:', err.message);
+    console.error('[EMAIL] Full error:', JSON.stringify(err));
   }
 }
 if (!process.env.VERCEL) {
