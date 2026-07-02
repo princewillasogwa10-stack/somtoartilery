@@ -3,74 +3,17 @@ import * as THREE from "three";
 
 class AmbientSynth {
   constructor() {
-    this.ctx = null;
-    this.masterGain = null;
-    this.reverbNode = null;
-    this.notes = [261.63, 293.66, 329.63, 392.0, 440.0, 523.25]; // C4 D4 E4 G4 A4 C5
+    this.audio = null;
     this.playing = false;
-    this.timeout = null;
-  }
-
-  playNote(freq, time) {
-    const osc = this.ctx.createOscillator();
-    const gain = this.ctx.createGain();
-    const filter = this.ctx.createBiquadFilter();
-
-    osc.type = "sine";
-    osc.frequency.setValueAtTime(freq, time);
-
-    filter.type = "lowpass";
-    filter.frequency.setValueAtTime(800 + Math.random() * 400, time);
-
-    const vol = 0.06 + Math.random() * 0.04;
-    gain.gain.setValueAtTime(0, time);
-    gain.gain.linearRampToValueAtTime(vol, time + 0.08);
-    gain.gain.linearRampToValueAtTime(vol * 0.7, time + 0.3);
-    gain.gain.exponentialRampToValueAtTime(0.0001, time + 2.0 + Math.random() * 1.5);
-
-    osc.connect(filter);
-    filter.connect(gain);
-    gain.connect(this.reverbNode);
-
-    osc.start(time);
-    osc.stop(time + 3.0);
-  }
-
-  scheduleNext() {
-    if (!this.playing) return;
-    const now = this.ctx.currentTime;
-    const delay = 2.5 + Math.random() * 4;
-    const freq = this.notes[Math.floor(Math.random() * this.notes.length)];
-    this.playNote(freq, now + delay * 0.3);
-    if (Math.random() > 0.6) {
-      const freq2 = this.notes[Math.floor(Math.random() * this.notes.length)];
-      this.playNote(freq2, now + delay * 0.6);
-    }
-    this.timeout = setTimeout(() => this.scheduleNext(), delay * 1000);
   }
 
   start() {
     try {
-      this.ctx = new (window.AudioContext || window.webkitAudioContext)();
-      this.masterGain = this.ctx.createGain();
-      this.masterGain.gain.setValueAtTime(0.5, this.ctx.currentTime);
-      this.masterGain.connect(this.ctx.destination);
-
-      this.reverbNode = this.ctx.createConvolver();
-      const rate = this.ctx.sampleRate;
-      const len = rate * 2;
-      const buffer = this.ctx.createBuffer(2, len, rate);
-      for (let ch = 0; ch < 2; ch++) {
-        const data = buffer.getChannelData(ch);
-        for (let i = 0; i < len; i++) {
-          data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (rate * 0.3));
-        }
-      }
-      this.reverbNode.buffer = buffer;
-      this.reverbNode.connect(this.masterGain);
-
+      this.audio = new Audio("/Gibran_Alcocer_-_Idea_10_(mp3.pm).mp3");
+      this.audio.loop = true;
+      this.audio.volume = 0.5;
+      this.audio.play();
       this.playing = true;
-      this.scheduleNext();
     } catch (e) {
       console.error("Failed to start Ambient Audio: ", e);
     }
@@ -78,13 +21,10 @@ class AmbientSynth {
 
   stop() {
     this.playing = false;
-    if (this.timeout) {
-      clearTimeout(this.timeout);
-      this.timeout = null;
-    }
-    if (this.ctx) {
-      try { this.ctx.close(); } catch (e) {}
-      this.ctx = null;
+    if (this.audio) {
+      this.audio.pause();
+      this.audio.currentTime = 0;
+      this.audio = null;
     }
   }
 }
@@ -235,7 +175,7 @@ function Header({ inquiryCount, onOpenCart, user, onLogout, isAdminActive, onTog
               <span className="bar" />
               <span className="bar" />
             </span>
-            <span>{ambientPlaying ? "Mute Gallery" : "Gallery Ambient"}</span>
+            <span>{ambientPlaying ? "Mute" : "Gibran_Alcocer_-_Idea_10_(mp3.pm).mp3"}</span>
           </button>
         )}
         {!isAdminActive && (
