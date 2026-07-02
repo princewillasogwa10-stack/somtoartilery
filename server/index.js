@@ -9,13 +9,39 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const DATA_DIR = join(__dirname, 'data');
+
+// On Vercel, the filesystem is read-only, so we use /tmp for data writes.
+const DATA_DIR = process.env.VERCEL ? '/tmp/data' : join(__dirname, 'data');
 const USERS_FILE = join(DATA_DIR, 'users.json');
 const SUBMISSIONS_FILE = join(DATA_DIR, 'submissions.json');
 
 if (!existsSync(DATA_DIR)) {
   mkdirSync(DATA_DIR, { recursive: true });
 }
+
+// Copy seed files from repository to /tmp on Vercel startup
+if (process.env.VERCEL) {
+  const seedUsers = join(process.cwd(), 'server', 'data', 'users.json');
+  const seedSubmissions = join(process.cwd(), 'server', 'data', 'submissions.json');
+
+  if (!existsSync(USERS_FILE) && existsSync(seedUsers)) {
+    try {
+      const data = readFileSync(seedUsers, 'utf-8');
+      writeFileSync(USERS_FILE, data, 'utf-8');
+    } catch (e) {
+      console.error('Failed to seed users:', e);
+    }
+  }
+  if (!existsSync(SUBMISSIONS_FILE) && existsSync(seedSubmissions)) {
+    try {
+      const data = readFileSync(seedSubmissions, 'utf-8');
+      writeFileSync(SUBMISSIONS_FILE, data, 'utf-8');
+    } catch (e) {
+      console.error('Failed to seed submissions:', e);
+    }
+  }
+}
+
 for (const file of [USERS_FILE, SUBMISSIONS_FILE]) {
   if (!existsSync(file)) {
     writeFileSync(file, '[]', 'utf-8');
@@ -23,7 +49,7 @@ for (const file of [USERS_FILE, SUBMISSIONS_FILE]) {
 }
 
 const JWT_SECRET = process.env.JWT_SECRET || 'galleria-nazareth-secret-key';
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 const TO_EMAIL = process.env.TO_EMAIL || 'princewillasogwa10@gmail.com';
 
 const app = express();
@@ -119,7 +145,7 @@ app.get('/api/users', (req, res) => {
 });
 
 async function sendEmailNotification(entry) {
-  if (!process.env.RESEND_API_KEY) return;
+  if (!resend) return;
   try {
     await resend.emails.send({
       from: 'SOMTO ATELIER <onboarding@resend.dev>',
@@ -132,8 +158,11 @@ async function sendEmailNotification(entry) {
     console.error('Email send failed:', err.message);
   }
 }
+if (!process.env.VERCEL) {
+  const PORT = process.env.PORT || 3001;
+  app.listen(PORT, () => {
+    console.log(`SOMTO ATELIER API running on http://localhost:${PORT}`);
+  });
+}
 
-const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => {
-  console.log(`SOMTO ATELIER API running on http://localhost:${PORT}`);
-});
+export default app;
