@@ -60,7 +60,7 @@ const products = [
 
 const filters = ["all", "painting"];
 
-function Header({ inquiryCount, onOpenCart, user, onLogout }) {
+function Header({ inquiryCount, onOpenCart, user, onLogout, isAdminActive, onToggleAdmin }) {
   const [navOpen, setNavOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("");
 
@@ -75,7 +75,7 @@ function Header({ inquiryCount, onOpenCart, user, onLogout }) {
 
   return (
     <header className="site-header" aria-label="Main navigation">
-      <a className="brand" href="#top" aria-label="SOMTO ATELIER home">
+      <a className="brand" href="#top" aria-label="SOMTO ATELIER home" onClick={() => { if (isAdminActive) onToggleAdmin(false); }}>
         <span>SOMTO ATELIER</span>
       </a>
 
@@ -91,24 +91,48 @@ function Header({ inquiryCount, onOpenCart, user, onLogout }) {
       </button>
 
       <nav className={`nav-links ${navOpen ? "open" : ""}`} aria-label="Primary">
-        <a href="#collection" className={activeSection === "#collection" ? "active" : ""} onClick={() => setNavOpen(false)}>
-          Collection
-        </a>
-        <a href="#atelier" className={activeSection === "#atelier" ? "active" : ""} onClick={() => setNavOpen(false)}>
-          Atelier
-        </a>
-        <a href="#visit" className={activeSection === "#visit" ? "active" : ""} onClick={() => setNavOpen(false)}>
-          Visit
-        </a>
-        <button className="cart-button" type="button" onClick={onOpenCart} aria-label="Open inquiry bag">
-          <span className="cart-icon" aria-hidden="true">
-            +
-          </span>
-          <span>Inquiry</span>
-          <span className="cart-count">{inquiryCount}</span>
-        </button>
+        {!isAdminActive && (
+          <>
+            <a href="#collection" className={activeSection === "#collection" ? "active" : ""} onClick={() => setNavOpen(false)}>
+              Collection
+            </a>
+            <a href="#atelier" className={activeSection === "#atelier" ? "active" : ""} onClick={() => setNavOpen(false)}>
+              Atelier
+            </a>
+            <a href="#visit" className={activeSection === "#visit" ? "active" : ""} onClick={() => setNavOpen(false)}>
+              Visit
+            </a>
+          </>
+        )}
+        {user && user.email === 'somtoasogwa10@gmail.com' && (
+          <button
+            className="admin-toggle-link"
+            type="button"
+            onClick={() => { onToggleAdmin(!isAdminActive); setNavOpen(false); }}
+            style={{
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              fontWeight: isAdminActive ? '900' : '600',
+              color: isAdminActive ? 'var(--ink)' : 'var(--muted)',
+              fontSize: '0.92rem',
+              padding: 0
+            }}
+          >
+            {isAdminActive ? "View Site" : "Admin Dashboard"}
+          </button>
+        )}
+        {!isAdminActive && (
+          <button className="cart-button" type="button" onClick={onOpenCart} aria-label="Open inquiry bag">
+            <span className="cart-icon" aria-hidden="true">
+              +
+            </span>
+            <span>Inquiry</span>
+            <span className="cart-count">{inquiryCount}</span>
+          </button>
+        )}
         {user ? (
-          <button className="logout-link" type="button" onClick={() => { onLogout(); setNavOpen(false); }}>
+          <button className="logout-link" type="button" onClick={() => { onLogout(); setNavOpen(false); if (isAdminActive) onToggleAdmin(false); }}>
             Log out <strong>{user.name}</strong>
           </button>
         ) : (
@@ -511,11 +535,145 @@ function InquiryBag({ items, open, onClose, onRemove }) {
   );
 }
 
+function AdminDashboard({ token, onClose }) {
+  const [inquiries, setInquiries] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+
+  useEffect(() => {
+    async function fetchInquiries() {
+      try {
+        const res = await fetch("/api/submissions", {
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
+        });
+        if (!res.ok) {
+          throw new Error("Failed to fetch inquiries");
+        }
+        const data = await res.json();
+        setInquiries(data);
+      } catch (e) {
+        setError(e.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchInquiries();
+  }, [token]);
+
+  const filteredInquiries = inquiries.filter(item => {
+    const term = searchTerm.toLowerCase();
+    return (
+      item.name.toLowerCase().includes(term) ||
+      item.email.toLowerCase().includes(term) ||
+      (item.interest && item.interest.toLowerCase().includes(term)) ||
+      (item.works && item.works.toLowerCase().includes(term))
+    );
+  });
+
+  // Calculate stats
+  const totalInquiries = inquiries.length;
+  const uniqueUsers = new Set(inquiries.map(i => i.email)).size;
+  const totalArtworksCount = inquiries.reduce((sum, item) => {
+    if (!item.works) return sum;
+    const count = item.works.split(",").map(w => w.trim()).filter(Boolean).length;
+    return sum + count;
+  }, 0);
+
+  return (
+    <section className="admin-dashboard">
+      <div className="admin-header">
+        <h2>Inquiries Dashboard</h2>
+        <button className="button secondary" onClick={onClose}>Back to Gallery</button>
+      </div>
+
+      <div className="admin-stats">
+        <div className="stat-card">
+          <h3>Total Inquiries</h3>
+          <p>{totalInquiries}</p>
+        </div>
+        <div className="stat-card">
+          <h3>Unique Enquirers</h3>
+          <p>{uniqueUsers}</p>
+        </div>
+        <div className="stat-card">
+          <h3>Artworks Inquired</h3>
+          <p>{totalArtworksCount}</p>
+        </div>
+      </div>
+
+      <div className="admin-controls">
+        <input 
+          type="text" 
+          placeholder="Search by name, email, interest, or artwork..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="search-input"
+        />
+      </div>
+
+      {loading && <p>Loading inquiries...</p>}
+      {error && <p className="form-status error">Error: {error}</p>}
+
+      {!loading && !error && (
+        <div className="inquiries-list">
+          {filteredInquiries.length === 0 ? (
+            <div className="empty-state">
+              <h3>No inquiries found</h3>
+              <p>Either there are no submissions yet, or your search didn't match any records.</p>
+            </div>
+          ) : (
+            filteredInquiries.map((inquiry) => {
+              const artworks = inquiry.works ? inquiry.works.split(",").map(w => w.trim()).filter(Boolean) : [];
+              return (
+                <div key={inquiry.id} className="inquiry-card">
+                  <div className="inquiry-meta">
+                    <div className="inquiry-user">
+                      <h4>{inquiry.name}</h4>
+                      <p>{inquiry.email}</p>
+                    </div>
+                    <span className="inquiry-date">
+                      {new Date(inquiry.createdAt).toLocaleDateString(undefined, {
+                        year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
+                      })}
+                    </span>
+                  </div>
+                  <div className="inquiry-details">
+                    {inquiry.interest && (
+                      <div className="inquiry-field">
+                        <h5>Area of Interest</h5>
+                        <p>{inquiry.interest}</p>
+                      </div>
+                    )}
+                    {artworks.length > 0 && (
+                      <div className="inquiry-field">
+                        <h5>Selected Artworks</h5>
+                        <div className="artworks-list">
+                          {artworks.map((art, idx) => (
+                            <span key={idx} className="artwork-tag">{art}</span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+      )}
+    </section>
+  );
+}
+
 export default function App() {
   const [inquiryItems, setInquiryItems] = useState([]);
   const [cartOpen, setCartOpen] = useState(false);
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
+  const [isAdminActive, setIsAdminActive] = useState(false);
 
   useEffect(() => {
     const savedToken = localStorage.getItem("token");
@@ -536,6 +694,7 @@ export default function App() {
   function handleLogout() {
     setToken(null);
     setUser(null);
+    setIsAdminActive(false);
     localStorage.removeItem("token");
     localStorage.removeItem("user");
   }
@@ -555,24 +714,39 @@ export default function App() {
 
   return (
     <>
-      <Header inquiryCount={inquiryItems.length} onOpenCart={() => setCartOpen(true)} user={user} onLogout={handleLogout} />
+      <Header 
+        inquiryCount={inquiryItems.length} 
+        onOpenCart={() => setCartOpen(true)} 
+        user={user} 
+        onLogout={handleLogout} 
+        isAdminActive={isAdminActive}
+        onToggleAdmin={setIsAdminActive}
+      />
       <main id="top">
-        <Hero />
-        <Intro />
-        <Collection onAdd={addInquiryItem} user={user} />
-        <Atelier />
-        {user ? (
-          <Visit inquiryItems={inquiryItems} token={token} />
+        {isAdminActive ? (
+          <AdminDashboard token={token} onClose={() => setIsAdminActive(false)} />
         ) : (
-          <Auth onAuth={handleAuth} />
+          <>
+            <Hero />
+            <Intro />
+            <Collection onAdd={addInquiryItem} user={user} />
+            <Atelier />
+            {user ? (
+              <Visit inquiryItems={inquiryItems} token={token} />
+            ) : (
+              <Auth onAuth={handleAuth} />
+            )}
+          </>
         )}
       </main>
-      <InquiryBag
-        items={inquiryItems}
-        open={cartOpen}
-        onClose={() => setCartOpen(false)}
-        onRemove={removeInquiryItem}
-      />
+      {!isAdminActive && (
+        <InquiryBag
+          items={inquiryItems}
+          open={cartOpen}
+          onClose={() => setCartOpen(false)}
+          onRemove={removeInquiryItem}
+        />
+      )}
       <footer>
         <p>SOMTO ATELIER</p>
         <p>Contemporary sculpture, collector services, and private viewings.</p>

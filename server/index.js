@@ -135,7 +135,10 @@ app.post('/api/inquiry', authMiddleware, async (req, res) => {
   res.json({ message: 'Your interest has been sent.', entry });
 });
 
-app.get('/api/submissions', (req, res) => {
+app.get('/api/submissions', authMiddleware, (req, res) => {
+  if (req.user.email !== 'somtoasogwa10@gmail.com') {
+    return res.status(403).json({ error: 'Access denied: Admin only' });
+  }
   res.json(readJSON(SUBMISSIONS_FILE));
 });
 
