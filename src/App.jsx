@@ -117,7 +117,7 @@ const products = [
     availability: "Available now",
     image: "/assets/abstract-lady.jpg",
     alt: "Abstract painting of a lady",
-    copy: "A vibrant abstract portrait with expressive brushwork and rich color composition."
+    copy: "Made by Michael Amba. A vibrant abstract portrait with expressive brushwork and rich color composition."
   },
   {
     name: "Untitled Composition",
@@ -128,7 +128,7 @@ const products = [
     availability: "Available now",
     image: "/assets/art-7.jpg",
     alt: "Abstract composition artwork",
-    copy: "A compelling mixed-media piece with layered textures and bold compositional elements."
+    copy: "Made by Michael Amba. A compelling mixed-media piece with layered textures and bold compositional elements."
   },
   {
     name: "Abstract Study",
@@ -139,7 +139,7 @@ const products = [
     availability: "Available now",
     image: "/assets/art-6.jpg",
     alt: "Abstract study artwork",
-    copy: "An evocative abstract study with dynamic form and nuanced color harmony."
+    copy: "Made by Michael Amba. An evocative abstract study with dynamic form and nuanced color harmony."
   },
   {
     name: "Dreamscape",
@@ -150,7 +150,7 @@ const products = [
     availability: "Available now",
     image: "/assets/art-5.jpg",
     alt: "Dreamscape abstract artwork",
-    copy: "A dreamy abstract composition with flowing forms and a soft, atmospheric palette."
+    copy: "Made by Michael Amba. A dreamy abstract composition with flowing forms and a soft, atmospheric palette."
   },
   {
     name: "United Series by Michael Amba",
