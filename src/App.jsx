@@ -176,7 +176,7 @@ function Header({ inquiryCount, onOpenCart, user, onLogout, isAdminActive, onTog
               <span className="bar" />
               <span className="bar" />
             </span>
-            <span>{ambientPlaying ? "Mute" : "Gibran_Alcocer_-_Idea_10_(mp3.pm).mp3"}</span>
+            <span>{ambientPlaying ? "Pause" : "Listen Now"}</span>
           </button>
         )}
         {!isAdminActive && (
