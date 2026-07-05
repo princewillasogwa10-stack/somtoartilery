@@ -10,9 +10,9 @@
   --line: rgba(23, 21, 21, 0.14);
   --shadow: 0 20px 60px rgba(23, 21, 21, 0.14);
   
-  /* Font themes defaults (Classic: Cormorant Garamond + Montserrat) */
-  --font-headings: "Cormorant Garamond", Georgia, serif;
-  --font-body: "Montserrat", sans-serif;
+  /* Font themes defaults (Classic: DM Serif Display + DM Sans) */
+  --font-headings: "DM Serif Display", Georgia, serif;
+  --font-body: "DM Sans", sans-serif;
 }
 
 body.theme-modern {
