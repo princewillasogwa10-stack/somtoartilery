@@ -136,6 +136,16 @@ app.get('/api/me', authMiddleware, (req, res) => {
   res.json({ user: req.user });
 });
 
+app.patch('/api/user/profile', authMiddleware, async (req, res) => {
+  const { profilePicture } = req.body;
+  const users = readJSON(USERS_FILE);
+  const idx = users.findIndex(u => String(u.id) === String(req.user.id));
+  if (idx === -1) return res.status(404).json({ error: 'User not found' });
+  users[idx].profilePicture = profilePicture || '';
+  writeJSON(USERS_FILE, users);
+  res.json({ user: { id: users[idx].id, name: users[idx].name, email: users[idx].email, profilePicture: users[idx].profilePicture } });
+});
+
 app.post('/api/inquiry', authMiddleware, async (req, res) => {
   const { interest, works } = req.body;
   const { name, email } = req.user;

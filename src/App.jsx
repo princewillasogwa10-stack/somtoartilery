@@ -89,9 +89,11 @@ const products = [
 
 const filters = ["all", "painting"];
 
-function Header({ inquiryCount, onOpenCart, user, onLogout, isAdminActive, onToggleAdmin, ambientPlaying, onToggleAmbient }) {
+function Header({ inquiryCount, onOpenCart, user, onLogout, isAdminActive, onToggleAdmin, ambientPlaying, onToggleAmbient, onProfileUpdate, token }) {
   const [navOpen, setNavOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("");
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     function onHashChange() {
@@ -188,9 +190,61 @@ function Header({ inquiryCount, onOpenCart, user, onLogout, isAdminActive, onTog
           </button>
         )}
         {user ? (
-          <button className="logout-link" type="button" onClick={() => { onLogout(); setNavOpen(false); if (isAdminActive) onToggleAdmin(false); }}>
-            Log out <strong>{user.name}</strong>
-          </button>
+          <div className="user-profile-section">
+            <button className="profile-btn" type="button" onClick={() => setShowProfileMenu(!showProfileMenu)}>
+              {user.profilePicture ? (
+                <img src={user.profilePicture} alt={user.name} className="profile-picture" />
+              ) : (
+                <span className="profile-initials">{user.name.charAt(0).toUpperCase()}</span>
+              )}
+            </button>
+            {showProfileMenu && (
+              <div className="profile-dropdown">
+                <div className="profile-dropdown-header">
+                  {user.profilePicture ? (
+                    <img src={user.profilePicture} alt={user.name} className="profile-picture-large" />
+                  ) : (
+                    <span className="profile-initials-large">{user.name.charAt(0).toUpperCase()}</span>
+                  )}
+                  <div className="profile-user-info">
+                    <strong>{user.name}</strong>
+                    <span>{user.email}</span>
+                  </div>
+                </div>
+                <label className="profile-upload-btn">
+                  <input type="file" accept="image/*" onChange={async (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    setUploading(true);
+                    const reader = new FileReader();
+                    reader.onload = async (ev) => {
+                      const base64 = ev.target.result;
+                      try {
+                        const res = await fetch("/api/user/profile", {
+                          method: "PATCH",
+                          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+                          body: JSON.stringify({ profilePicture: base64 })
+                        });
+                        if (res.ok) {
+                          const data = await res.json();
+                          onProfileUpdate(data.user);
+                        }
+                      } catch (err) {
+                        console.error("Failed to update profile picture:", err);
+                      } finally {
+                        setUploading(false);
+                      }
+                    };
+                    reader.readAsDataURL(file);
+                  }} hidden />
+                  {uploading ? "Uploading..." : "Change Photo"}
+                </label>
+                <button className="logout-link" type="button" onClick={() => { onLogout(); setNavOpen(false); setShowProfileMenu(false); if (isAdminActive) onToggleAdmin(false); }}>
+                  Log out
+                </button>
+              </div>
+            )}
+          </div>
         ) : (
           <a href="#auth" className="auth-link" onClick={() => setNavOpen(false)}>
             Sign in
@@ -1445,6 +1499,13 @@ export default function App() {
     });
   }
 
+  function handleProfileUpdate(updatedUser) {
+    withTransition(() => {
+      setUser(updatedUser);
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+    });
+  }
+
   function handleLogout() {
     withTransition(() => {
       setToken(null);
@@ -1483,6 +1544,8 @@ export default function App() {
         onToggleAdmin={setIsAdminActive}
         ambientPlaying={ambientPlaying}
         onToggleAmbient={toggleAmbient}
+        onProfileUpdate={handleProfileUpdate}
+        token={token}
       />
       <main id="top">
         {isAdminActive ? (
