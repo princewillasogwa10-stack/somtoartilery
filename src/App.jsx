@@ -225,19 +225,27 @@ function Header({ inquiryCount, onOpenCart, user, onLogout, isAdminActive, onTog
                   <input type="file" accept="image/*" onChange={async (e) => {
                     const file = e.target.files[0];
                     if (!file) return;
+                    console.log("File selected:", file.name, file.size);
                     setUploading(true);
                     const reader = new FileReader();
-                    reader.onload = async (ev) => {
+                    reader.onloadend = async (ev) => {
                       const base64 = ev.target.result;
+                      console.log("Base64 length:", base64.length);
                       try {
+                        console.log("Sending request to /api/user/profile...");
                         const res = await fetch("/api/user/profile", {
                           method: "PATCH",
                           headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
                           body: JSON.stringify({ profilePicture: base64 })
                         });
+                        console.log("Response status:", res.status);
+                        const data = await res.json();
+                        console.log("Response data:", data);
                         if (res.ok) {
-                          const data = await res.json();
                           onProfileUpdate(data.user, data.token);
+                          console.log("Profile updated successfully!");
+                        } else {
+                          console.error("Server error:", data.error);
                         }
                       } catch (err) {
                         console.error("Failed to update profile picture:", err);
