@@ -89,6 +89,33 @@ const products = [
 
 const filters = ["all", "painting"];
 
+function compressImage(file, maxSize, quality) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        let { width, height } = img;
+        if (width > height) {
+          if (width > maxSize) { height = (height * maxSize) / width; width = maxSize; }
+        } else {
+          if (height > maxSize) { width = (width * maxSize) / height; height = maxSize; }
+        }
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL("image/jpeg", quality));
+      };
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
 function Header({ inquiryCount, onOpenCart, user, onLogout, isAdminActive, onToggleAdmin, ambientPlaying, onToggleAmbient, onProfileUpdate, token }) {
   const [navOpen, setNavOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("");
@@ -225,35 +252,25 @@ function Header({ inquiryCount, onOpenCart, user, onLogout, isAdminActive, onTog
                   <input type="file" accept="image/*" onChange={async (e) => {
                     const file = e.target.files[0];
                     if (!file) return;
-                    console.log("File selected:", file.name, file.size);
                     setUploading(true);
-                    const reader = new FileReader();
-                    reader.onloadend = async (ev) => {
-                      const base64 = ev.target.result;
-                      console.log("Base64 length:", base64.length);
-                      try {
-                        console.log("Sending request to /api/user/profile...");
-                        const res = await fetch("/api/user/profile", {
-                          method: "PATCH",
-                          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-                          body: JSON.stringify({ profilePicture: base64 })
-                        });
-                        console.log("Response status:", res.status);
-                        const data = await res.json();
-                        console.log("Response data:", data);
-                        if (res.ok) {
-                          onProfileUpdate(data.user, data.token);
-                          console.log("Profile updated successfully!");
-                        } else {
-                          console.error("Server error:", data.error);
-                        }
-                      } catch (err) {
-                        console.error("Failed to update profile picture:", err);
-                      } finally {
-                        setUploading(false);
+                    try {
+                      const base64 = await compressImage(file, 200, 0.8);
+                      const res = await fetch("/api/user/profile", {
+                        method: "PATCH",
+                        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+                        body: JSON.stringify({ profilePicture: base64 })
+                      });
+                      const data = await res.json();
+                      if (res.ok) {
+                        onProfileUpdate(data.user, data.token);
+                      } else {
+                        console.error("Server error:", data.error);
                       }
-                    };
-                    reader.readAsDataURL(file);
+                    } catch (err) {
+                      console.error("Failed to update profile picture:", err);
+                    } finally {
+                      setUploading(false);
+                    }
                   }} hidden />
                   {uploading ? "Uploading..." : "Change Photo"}
                 </label>
