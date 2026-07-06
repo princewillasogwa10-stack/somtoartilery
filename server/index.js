@@ -143,7 +143,8 @@ app.patch('/api/user/profile', authMiddleware, async (req, res) => {
   if (idx === -1) return res.status(404).json({ error: 'User not found' });
   users[idx].profilePicture = profilePicture || '';
   writeJSON(USERS_FILE, users);
-  res.json({ user: { id: users[idx].id, name: users[idx].name, email: users[idx].email, profilePicture: users[idx].profilePicture } });
+  const newToken = jwt.sign({ id: users[idx].id, name: users[idx].name, email: users[idx].email }, JWT_SECRET, { expiresIn: '7d' });
+  res.json({ token: newToken, user: { id: users[idx].id, name: users[idx].name, email: users[idx].email, profilePicture: users[idx].profilePicture } });
 });
 
 app.post('/api/inquiry', authMiddleware, async (req, res) => {

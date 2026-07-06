@@ -104,6 +104,16 @@ function Header({ inquiryCount, onOpenCart, user, onLogout, isAdminActive, onTog
     return () => window.removeEventListener("hashchange", onHashChange);
   }, []);
 
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (showProfileMenu && !e.target.closest('.user-profile-section')) {
+        setShowProfileMenu(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showProfileMenu]);
+
   return (
     <header className="site-header" aria-label="Main navigation">
       <a className="brand" href="#top" aria-label="SOMTO ATELIER home" onClick={() => { if (isAdminActive) onToggleAdmin(false); }}>
@@ -227,7 +237,7 @@ function Header({ inquiryCount, onOpenCart, user, onLogout, isAdminActive, onTog
                         });
                         if (res.ok) {
                           const data = await res.json();
-                          onProfileUpdate(data.user);
+                          onProfileUpdate(data.user, data.token);
                         }
                       } catch (err) {
                         console.error("Failed to update profile picture:", err);
@@ -1499,10 +1509,14 @@ export default function App() {
     });
   }
 
-  function handleProfileUpdate(updatedUser) {
+  function handleProfileUpdate(updatedUser, newToken) {
     withTransition(() => {
       setUser(updatedUser);
       localStorage.setItem("user", JSON.stringify(updatedUser));
+      if (newToken) {
+        setToken(newToken);
+        localStorage.setItem("token", newToken);
+      }
     });
   }
 
