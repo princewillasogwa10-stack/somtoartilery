@@ -1,7 +1,23 @@
 @font-face {
-  font-family: 'Mileast';
-  src: url('/fonts/Mileast.otf') format('opentype');
-  font-weight: normal;
+  font-family: 'GrenzeGotisch';
+  src: url('/fonts/static/GrenzeGotisch-Thin.ttf') format('truetype');
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'GrenzeGotisch';
+  src: url('/fonts/static/GrenzeGotisch-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'GrenzeGotisch';
+  src: url('/fonts/static/GrenzeGotisch-Regular.ttf') format('truetype');
+  font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
@@ -141,7 +157,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 
 .brand {
   gap: 10px;
-  font-family: 'Mileast', var(--font-headings);
+  font-family: 'GrenzeGotisch', var(--font-headings);
   font-weight: 100;
   text-transform: uppercase;
 }
@@ -249,7 +265,7 @@ h1 {
 }
 
 #hero-title {
-  font-family: 'Mileast', var(--font-headings);
+  font-family: 'GrenzeGotisch', var(--font-headings);
   font-weight: 100;
 }
 
