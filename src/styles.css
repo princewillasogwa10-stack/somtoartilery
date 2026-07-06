@@ -1,14 +1,14 @@
 :root {
-  --ink: #e8eaf0;
-  --paper: #0c0e14;
-  --chalk: #13161f;
-  --oxide: #6b8cce;
-  --clay: #c47a7a;
-  --brass: #b8a67c;
-  --stone: #1e2130;
-  --muted: #8b8fa3;
-  --line: rgba(255, 255, 255, 0.08);
-  --shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  --ink: #171515;
+  --paper: #f7f1e7;
+  --chalk: #fffaf2;
+  --oxide: #1f5c4a;
+  --clay: #b75b3f;
+  --brass: #b9934a;
+  --stone: #d7d0c4;
+  --muted: #6d665e;
+  --line: rgba(23, 21, 21, 0.14);
+  --shadow: 0 20px 60px rgba(23, 21, 21, 0.14);
   
   /* Font themes defaults (Classic: DM Serif Display + DM Sans) */
   --font-headings: "DM Serif Display", Georgia, serif;
@@ -97,7 +97,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 
 .site-header {
   align-items: center;
-  background: rgba(19, 22, 31, 0.88);
+  background: rgba(247, 241, 231, 0.88);
   backdrop-filter: blur(18px);
   border-bottom: 1px solid var(--line);
   display: flex;
@@ -189,7 +189,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 .hero {
   display: grid;
   background:
-    linear-gradient(120deg, rgba(12, 14, 20, 0.9), rgba(19, 22, 31, 0.82)),
+    linear-gradient(120deg, rgba(247, 241, 231, 0.9), rgba(255, 250, 242, 0.82)),
     linear-gradient(90deg, rgba(31, 92, 74, 0.12) 1px, transparent 1px),
     linear-gradient(0deg, rgba(31, 92, 74, 0.1) 1px, transparent 1px);
   background-size: auto, 72px 72px, 72px 72px;
@@ -470,7 +470,7 @@ h3 {
 }
 
 .lightbox {
-  background: rgba(0, 0, 0, 0.85);
+  background: rgba(23, 21, 21, 0.85);
   display: flex;
   inset: 0;
   padding: 20px;
@@ -767,7 +767,7 @@ textarea {
 }
 
 .scrim {
-  background: rgba(0, 0, 0, 0.42);
+  background: rgba(23, 21, 21, 0.42);
   inset: 0;
   opacity: 0;
   pointer-events: none;
@@ -1000,7 +1000,7 @@ footer p {
   border: 1px solid var(--line);
   padding: 24px;
   border-radius: 4px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 12px rgba(23, 21, 21, 0.04);
 }
 
 .stat-card h3 {
@@ -1047,7 +1047,7 @@ footer p {
   padding: 24px;
   border-radius: 4px;
   margin-bottom: 20px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 20px rgba(23, 21, 21, 0.02);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -1178,23 +1178,23 @@ footer p {
 }
 
 .status-new {
-  background: rgba(107, 140, 206, 0.15);
-  color: #6b8cce;
+  background: #e8f0fe;
+  color: #1a56db;
 }
 
 .status-contacted {
-  background: rgba(200, 160, 90, 0.15);
-  color: #c8a05a;
+  background: #fef3c7;
+  color: #92400e;
 }
 
 .status-resolved {
-  background: rgba(100, 180, 150, 0.15);
-  color: #64b496;
+  background: #d1fae5;
+  color: #065f46;
 }
 
-.stat-card.status-new { border-left: 4px solid #6b8cce; }
-.stat-card.status-contacted { border-left: 4px solid #c8a05a; }
-.stat-card.status-resolved { border-left: 4px solid #64b496; }
+.stat-card.status-new { border-left: 4px solid #1a56db; }
+.stat-card.status-contacted { border-left: 4px solid #92400e; }
+.stat-card.status-resolved { border-left: 4px solid #065f46; }
 
 /* Inquiry Checkbox Row */
 .inquiry-checkbox-row {
@@ -1248,12 +1248,12 @@ footer p {
 }
 
 .icon-btn.danger {
-  color: #c47a7a;
-  border-color: rgba(196, 122, 122, 0.3);
+  color: #b91c1c;
+  border-color: #fca5a5;
 }
 
 .icon-btn.danger:hover {
-  background: rgba(196, 122, 122, 0.1);
+  background: #fef2f2;
 }
 
 .inquiry-card.selected {
@@ -1306,13 +1306,13 @@ footer p {
 }
 
 .button.danger {
-  background: #c47a7a;
-  color: var(--chalk);
-  border: 1px solid #c47a7a;
+  background: #b91c1c;
+  color: #fff;
+  border: 1px solid #b91c1c;
 }
 
 .button.danger:hover {
-  background: #b06868;
+  background: #991b1b;
 }
 
 /* Bulk Toolbar */
@@ -1321,8 +1321,8 @@ footer p {
   align-items: center;
   gap: 12px;
   padding: 12px 16px;
-  background: rgba(107, 140, 206, 0.08);
-  border: 1px solid rgba(107, 140, 206, 0.25);
+  background: #f0fdf4;
+  border: 1px solid #86efac;
   border-radius: 4px;
   margin-bottom: 20px;
   flex-wrap: wrap;
@@ -1331,7 +1331,7 @@ footer p {
 .bulk-toolbar span {
   font-size: 0.85rem;
   font-weight: 600;
-  color: #6b8cce;
+  color: #065f46;
 }
 
 /* Inquiries Toolbar */
@@ -1588,7 +1588,7 @@ footer p {
 .audio-guide-btn:hover {
   border-color: var(--ink);
   color: var(--ink);
-  background: rgba(107, 140, 206, 0.05);
+  background: rgba(23, 21, 21, 0.02);
 }
 
 .audio-guide-btn.playing {
