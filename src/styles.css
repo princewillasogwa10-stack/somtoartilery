@@ -1,6 +1,14 @@
 @font-face {
-  font-family: 'Rockybilly';
-  src: url('/fonts/Rockybilly.ttf') format('truetype');
+  font-family: 'Mileast';
+  src: url('/fonts/Mileast.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'BrandalLegend';
+  src: url('/fonts/Brandal%20Legend%20Demo.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -133,8 +141,8 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 
 .brand {
   gap: 10px;
-  font-family: 'Rockybilly', var(--font-headings);
-  font-weight: normal;
+  font-family: 'Mileast', var(--font-headings);
+  font-weight: 100;
   text-transform: uppercase;
 }
 
@@ -241,7 +249,8 @@ h1 {
 }
 
 #hero-title {
-  font-weight: 200;
+  font-family: 'Mileast', var(--font-headings);
+  font-weight: 100;
 }
 
 h2 {

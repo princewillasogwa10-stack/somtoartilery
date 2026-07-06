@@ -105,7 +105,7 @@ function Header({ inquiryCount, onOpenCart, user, onLogout, isAdminActive, onTog
   return (
     <header className="site-header" aria-label="Main navigation">
       <a className="brand" href="#top" aria-label="SOMTO ATELIER home" onClick={() => { if (isAdminActive) onToggleAdmin(false); }}>
-        <span>ORANGE AVENUE</span>
+        <span>SOMTO ATELIER</span>
       </a>
 
       <button
