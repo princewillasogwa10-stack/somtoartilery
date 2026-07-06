@@ -297,7 +297,7 @@ function Hero() {
   useEffect(() => {
     const timer = setInterval(() => {
       setSlide((s) => (s + 1) % products.length);
-    }, 4000);
+    }, 7000);
     return () => clearInterval(timer);
   }, []);
 
