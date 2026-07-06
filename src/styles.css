@@ -1,14 +1,14 @@
 :root {
   --ink: #e8eaf0;
-  --paper: #000000;
-  --chalk: #0a0a0a;
+  --paper: #0c0e14;
+  --chalk: #13161f;
   --oxide: #6b8cce;
   --clay: #c47a7a;
   --brass: #b8a67c;
-  --stone: #1a1a1a;
+  --stone: #1e2130;
   --muted: #8b8fa3;
   --line: rgba(255, 255, 255, 0.08);
-  --shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+  --shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
   
   /* Font themes defaults (Classic: DM Serif Display + DM Sans) */
   --font-headings: "DM Serif Display", Georgia, serif;
@@ -97,7 +97,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 
 .site-header {
   align-items: center;
-  background: rgba(0, 0, 0, 0.88);
+  background: rgba(19, 22, 31, 0.88);
   backdrop-filter: blur(18px);
   border-bottom: 1px solid var(--line);
   display: flex;
@@ -189,7 +189,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 .hero {
   display: grid;
   background:
-    linear-gradient(120deg, rgba(0, 0, 0, 0.9), rgba(10, 10, 10, 0.82)),
+    linear-gradient(120deg, rgba(12, 14, 20, 0.9), rgba(19, 22, 31, 0.82)),
     linear-gradient(90deg, rgba(31, 92, 74, 0.12) 1px, transparent 1px),
     linear-gradient(0deg, rgba(31, 92, 74, 0.1) 1px, transparent 1px);
   background-size: auto, 72px 72px, 72px 72px;
