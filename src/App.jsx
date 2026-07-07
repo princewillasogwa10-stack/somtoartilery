@@ -123,12 +123,24 @@ function Header({ inquiryCount, onOpenCart, user, onLogout, isAdminActive, onTog
   const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
-    function onHashChange() {
-      setActiveSection(window.location.hash);
+    function handleScroll() {
+      const scrollPos = window.scrollY + 200; // Offset for header clearance
+      const collectionEl = document.getElementById("collection");
+      const atelierEl = document.getElementById("atelier");
+
+      if (atelierEl && scrollPos >= atelierEl.offsetTop && scrollPos < (atelierEl.offsetTop + atelierEl.offsetHeight)) {
+        setActiveSection("#atelier");
+      } else if (collectionEl && scrollPos >= collectionEl.offsetTop && scrollPos < (collectionEl.offsetTop + collectionEl.offsetHeight)) {
+        setActiveSection("#collection");
+      } else {
+        setActiveSection("");
+      }
     }
-    window.addEventListener("hashchange", onHashChange);
-    setActiveSection(window.location.hash);
-    return () => window.removeEventListener("hashchange", onHashChange);
+
+    window.addEventListener("scroll", handleScroll);
+    handleScroll();
+
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   useEffect(() => {
@@ -143,7 +155,7 @@ function Header({ inquiryCount, onOpenCart, user, onLogout, isAdminActive, onTog
 
   return (
     <header className="site-header" aria-label="Main navigation">
-      <a className="brand" href="#top" aria-label="SOMTO ATELIER home" onClick={() => { if (isAdminActive) onToggleAdmin(false); }}>
+      <a className="brand" href="#top" aria-label="SOMTO ATELIER home" onClick={() => { if (isAdminActive) onToggleAdmin(false); }} style={{ display: "flex", alignItems: "center", gap: "10px" }}>
         <span>SOMTO ATELIER</span>
       </a>
 
@@ -195,18 +207,6 @@ function Header({ inquiryCount, onOpenCart, user, onLogout, isAdminActive, onTog
             type="button" 
             onClick={onToggleAmbient} 
             title="Toggle Ambient Gallery Soundscape"
-            style={{
-              background: "none",
-              border: "1px solid var(--line)",
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              gap: "6px",
-              padding: "5px 8px",
-              fontSize: "0.78rem",
-              fontWeight: "600",
-              color: "var(--muted)"
-            }}
           >
             <span className="sound-wave">
               <span className="bar" />
@@ -417,10 +417,8 @@ function AudioGuide({ text }) {
   );
 }
 
-function Collection({ onAdd, user }) {
+function Collection({ onAdd, user, darkRoom, setDarkRoom, lightbox, setLightbox }) {
   const [activeFilter, setActiveFilter] = useState("all");
-  const [lightbox, setLightbox] = useState(null);
-  const [darkRoom, setDarkRoom] = useState(false);
   const gridRef = useRef(null);
 
   const visibleProducts = useMemo(() => {
@@ -452,14 +450,6 @@ function Collection({ onAdd, user }) {
     }
   };
 
-  const closeLightbox = () => {
-    if (document.startViewTransition) {
-      document.startViewTransition(() => setLightbox(null));
-    } else {
-      setLightbox(null);
-    }
-  };
-
   const handleMouseMove = (e) => {
     if (!darkRoom || !gridRef.current) return;
     const rect = gridRef.current.getBoundingClientRect();
@@ -479,28 +469,6 @@ function Collection({ onAdd, user }) {
 
   return (
     <section className={`collection-section ${darkRoom ? "dark-room" : ""}`} id="collection" aria-labelledby="collection-title">
-      {lightbox && (
-        <div className="lightbox" onClick={closeLightbox}>
-          <div className="lightbox-content" onClick={(e) => e.stopPropagation()}>
-            <img 
-              src={lightbox.image} 
-              alt={lightbox.alt} 
-              style={{ viewTransitionName: "active-artwork-image" }}
-            />
-            <div className="lightbox-info">
-              <h3>{lightbox.name}</h3>
-              <p className="material">{lightbox.material}</p>
-              <p className="price">{lightbox.price}</p>
-              <p>{lightbox.copy}</p>
-              <dl className="product-details">
-                <div><dt>Dimensions</dt><dd>{lightbox.dimensions}</dd></div>
-                <div><dt>Status</dt><dd>{lightbox.availability}</dd></div>
-              </dl>
-            </div>
-            <button className="lightbox-close" onClick={closeLightbox}>x</button>
-          </div>
-        </div>
-      )}
       <div className="section-heading">
         <div>
           <p className="eyebrow">Current Collection</p>
@@ -511,16 +479,6 @@ function Collection({ onAdd, user }) {
             type="button" 
             className={`dark-room-toggle-btn ${darkRoom ? "active" : ""}`}
             onClick={toggleDarkRoom}
-            style={{
-              background: "none",
-              border: "1px solid var(--line)",
-              cursor: "pointer",
-              padding: "8px 16px",
-              fontSize: "0.85rem",
-              fontWeight: "600",
-              textTransform: "uppercase",
-              letterSpacing: "0.05em"
-            }}
           >
             {darkRoom ? "Light Mode" : "Dark Room"}
           </button>
@@ -556,10 +514,10 @@ function Collection({ onAdd, user }) {
               />
               <div className="product-info">
                 <div>
-                  <p className="material">{product.material}</p>
                   <h3>{product.name}</h3>
+                  <p className="price">{product.price}</p>
                 </div>
-                <p className="price">{product.price}</p>
+                <p className="material">{product.material}</p>
                 <p className="product-copy">{product.copy}</p>
               </div>
               <div className="product-card-actions">
@@ -1473,6 +1431,31 @@ export default function App() {
   const [token, setToken] = useState(null);
   const [isAdminActive, setIsAdminActiveState] = useState(false);
   const [ambientPlaying, setAmbientPlaying] = useState(false);
+  const [darkRoom, setDarkRoom] = useState(() => {
+    const saved = localStorage.getItem("darkRoom");
+    return saved ? JSON.parse(saved) : false;
+  });
+  const [lightbox, setLightbox] = useState(null);
+
+  useEffect(() => {
+    if (lightbox) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [lightbox]);
+
+  useEffect(() => {
+    if (darkRoom) {
+      document.body.classList.add("dark-room-mode");
+    } else {
+      document.body.classList.remove("dark-room-mode");
+    }
+    localStorage.setItem("darkRoom", JSON.stringify(darkRoom));
+  }, [darkRoom]);
 
   const synthRef = useRef(null);
 
@@ -1598,7 +1581,7 @@ export default function App() {
           <>
             <Hero user={user} />
             <Intro />
-            <Collection onAdd={addInquiryItem} user={user} />
+            <Collection onAdd={addInquiryItem} user={user} darkRoom={darkRoom} setDarkRoom={setDarkRoom} lightbox={lightbox} setLightbox={setLightbox} />
             <Atelier />
             {user ? (
               <Visit inquiryItems={inquiryItems} token={token} />
@@ -1617,8 +1600,47 @@ export default function App() {
           user={user}
         />
       )}
+      {lightbox && (
+        <div className="lightbox" onClick={() => setLightbox(null)}>
+          {darkRoom && <div className="lightbox-dark-overlay" />}
+          <div className="lightbox-content" onClick={(e) => e.stopPropagation()}>
+            <img 
+              src={lightbox.image} 
+              alt={lightbox.alt} 
+              style={{ viewTransitionName: "active-artwork-image" }}
+            />
+            <div className="lightbox-info">
+              <h3>{lightbox.name}</h3>
+              <p className="material">{lightbox.material}</p>
+              <p className="price">{lightbox.price}</p>
+              <p>{lightbox.copy}</p>
+              <dl className="product-details">
+                <div><dt>Dimensions</dt><dd>{lightbox.dimensions}</dd></div>
+                <div><dt>Status</dt><dd>{lightbox.availability}</dd></div>
+              </dl>
+              {user ? (
+                <button
+                  className="button card-action"
+                  type="button"
+                  onClick={() => { addInquiryItem(lightbox.name); setLightbox(null); }}
+                  style={{ marginTop: "24px", width: "100%" }}
+                >
+                  Add to inquiry
+                </button>
+              ) : (
+                <a className="button card-action" href="#auth" onClick={() => setLightbox(null)} style={{ marginTop: "24px", width: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  Sign in to add
+                </a>
+              )}
+            </div>
+            <button className="lightbox-close" onClick={() => setLightbox(null)}>x</button>
+          </div>
+        </div>
+      )}
       <footer>
-        <p>SOMTO ATELIER</p>
+        <div className="footer-brand" style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <p style={{ margin: 0, fontWeight: 700, letterSpacing: "0.14em", fontSize: "0.75rem", textTransform: "uppercase", color: "var(--ink)" }}>SOMTO ATELIER</p>
+        </div>
         <p>Contemporary sculpture, collector services, and private viewings.</p>
       </footer>
     </>

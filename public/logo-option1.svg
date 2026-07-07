@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <!-- S (Crimson Red) -->
+  <path d="M45 20H20V50H60V80H35" stroke="#ff3333" stroke-width="12" stroke-linecap="square" stroke-linejoin="miter"/>
+  <!-- A (currentColor - adapts to black/white) -->
+  <path d="M55 80V20H80V80M55 50H80" stroke="currentColor" stroke-width="12" stroke-linecap="square" stroke-linejoin="miter"/>
+</svg>
