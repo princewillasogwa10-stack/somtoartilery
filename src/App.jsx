@@ -167,9 +167,6 @@ function Header({ inquiryCount, onOpenCart, user, onLogout, isAdminActive, onTog
             <a href="#atelier" className={activeSection === "#atelier" ? "active" : ""} onClick={() => setNavOpen(false)}>
               Atelier
             </a>
-            <a href="#visit" className={activeSection === "#visit" ? "active" : ""} onClick={() => setNavOpen(false)}>
-              Visit
-            </a>
           </>
         )}
         {user && user.email === 'somtoasogwa10@gmail.com' && (
@@ -181,9 +178,11 @@ function Header({ inquiryCount, onOpenCart, user, onLogout, isAdminActive, onTog
               background: 'none',
               border: 'none',
               cursor: 'pointer',
-              fontWeight: isAdminActive ? '900' : '600',
+              fontWeight: isAdminActive ? '600' : '500',
               color: isAdminActive ? 'var(--ink)' : 'var(--muted)',
-              fontSize: '0.92rem',
+              fontSize: '0.82rem',
+              letterSpacing: '0.04em',
+              textTransform: 'uppercase',
               padding: 0
             }}
           >
@@ -202,9 +201,9 @@ function Header({ inquiryCount, onOpenCart, user, onLogout, isAdminActive, onTog
               cursor: "pointer",
               display: "flex",
               alignItems: "center",
-              gap: "8px",
-              padding: "8px 12px",
-              fontSize: "0.85rem",
+              gap: "6px",
+              padding: "5px 8px",
+              fontSize: "0.78rem",
               fontWeight: "600",
               color: "var(--muted)"
             }}
@@ -291,7 +290,7 @@ function Header({ inquiryCount, onOpenCart, user, onLogout, isAdminActive, onTog
 }
 
 
-function Hero() {
+function Hero({ user }) {
   const [slide, setSlide] = useState(0);
 
   useEffect(() => {
@@ -314,7 +313,7 @@ function Hero() {
           <a className="button primary" href="#collection">
             View Collection
           </a>
-          <a className="button secondary" href="#auth">
+          <a className="button secondary" href={user ? "#visit" : "#auth"}>
             Book Viewing
           </a>
         </div>
@@ -523,7 +522,7 @@ function Collection({ onAdd, user }) {
               letterSpacing: "0.05em"
             }}
           >
-            {darkRoom ? "☀️ Light Mode" : "🌙 Dark Room"}
+            {darkRoom ? "Light Mode" : "Dark Room"}
           </button>
           <div className="filter-tabs" role="tablist" aria-label="Filter sculptures">
             {filters.map((filter) => (
@@ -561,33 +560,35 @@ function Collection({ onAdd, user }) {
                   <h3>{product.name}</h3>
                 </div>
                 <p className="price">{product.price}</p>
+                <p className="product-copy">{product.copy}</p>
               </div>
-              <p className="product-copy">{product.copy}</p>
-              <dl className="product-details">
-                <div>
-                  <dt>Dimensions</dt>
-                  <dd>{product.dimensions}</dd>
-                </div>
-                <div>
-                  <dt>Status</dt>
-                  <dd>{product.availability}</dd>
-                </div>
-              </dl>
-              <AudioGuide text={`${product.name}. A ${product.material} sculpture. Measuring ${product.dimensions}. ${product.copy}`} />
-              {user ? (
-                <button
-                  className="button card-action"
-                  type="button"
-                  onClick={() => onAdd(product.name)}
-                  aria-label={`Add ${product.name} to inquiry`}
-                >
-                  Add to inquiry
-                </button>
-              ) : (
-                <a className="button card-action" href="#auth">
-                  Sign in to add
-                </a>
-              )}
+              <div className="product-card-actions">
+                <dl className="product-details">
+                  <div>
+                    <dt>Dimensions</dt>
+                    <dd>{product.dimensions}</dd>
+                  </div>
+                  <div>
+                    <dt>Status</dt>
+                    <dd>{product.availability}</dd>
+                  </div>
+                </dl>
+                <AudioGuide text={`${product.name}. A ${product.material} sculpture. Measuring ${product.dimensions}. ${product.copy}`} />
+                {user ? (
+                  <button
+                    className="button card-action"
+                    type="button"
+                    onClick={() => onAdd(product.name)}
+                    aria-label={`Add ${product.name} to inquiry`}
+                  >
+                    Add to inquiry
+                  </button>
+                ) : (
+                  <a className="button card-action" href="#auth">
+                    Sign in to add
+                  </a>
+                )}
+              </div>
             </article>
           ))}
         </div>
@@ -784,7 +785,7 @@ function Visit({ inquiryItems, token }) {
   );
 }
 
-function InquiryBag({ items, open, onClose, onRemove }) {
+function InquiryBag({ items, open, onClose, onRemove, user }) {
   const total = items.reduce((sum, item) => {
     const num = parseFloat(item.price.replace(/[₦,]/g, ""));
     return sum + num;
@@ -829,7 +830,7 @@ function InquiryBag({ items, open, onClose, onRemove }) {
             <span>{formatPrice(total)}</span>
           </div>
         )}
-        <a className="button primary cart-cta" href="#visit" onClick={onClose}>
+        <a className="button primary cart-cta" href={user ? "#visit" : "#auth"} onClick={onClose}>
           Send Inquiry
         </a>
       </aside>
@@ -1532,6 +1533,10 @@ export default function App() {
       localStorage.setItem("token", newToken);
       localStorage.setItem("user", JSON.stringify(newUser));
     });
+    requestAnimationFrame(() => {
+      const visitEl = document.getElementById("visit");
+      if (visitEl) visitEl.scrollIntoView({ behavior: "smooth" });
+    });
   }
 
   function handleProfileUpdate(updatedUser, newToken) {
@@ -1591,7 +1596,7 @@ export default function App() {
           <AdminDashboard token={token} onClose={() => setIsAdminActive(false)} />
         ) : (
           <>
-            <Hero />
+            <Hero user={user} />
             <Intro />
             <Collection onAdd={addInquiryItem} user={user} />
             <Atelier />
@@ -1609,6 +1614,7 @@ export default function App() {
           open={cartOpen}
           onClose={() => setCartOpen(false)}
           onRemove={removeInquiryItem}
+          user={user}
         />
       )}
       <footer>
