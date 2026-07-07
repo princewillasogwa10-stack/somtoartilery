@@ -919,7 +919,6 @@ function AdminDashboard({ token, onClose }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [interestFilter, setInterestFilter] = useState("all");
   const [dateFrom, setDateFrom] = useState("");
@@ -968,8 +967,6 @@ function AdminDashboard({ token, onClose }) {
   const uniqueInterests = [...new Set(inquiries.map(i => i.interest).filter(Boolean))];
 
   const filteredInquiries = inquiries.filter(item => {
-    const term = searchTerm.toLowerCase();
-    if (term && !(item.name.toLowerCase().includes(term) || item.email.toLowerCase().includes(term) || (item.interest && item.interest.toLowerCase().includes(term)) || (item.works && item.works.toLowerCase().includes(term)))) return false;
     if (statusFilter !== "all" && (item.status || "new") !== statusFilter) return false;
     if (interestFilter !== "all" && item.interest !== interestFilter) return false;
     if (dateFrom) {
@@ -1254,7 +1251,6 @@ function AdminDashboard({ token, onClose }) {
           </div>
 
           <div className="admin-controls">
-            <input type="text" placeholder="Search by name, email, interest, or artwork..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="search-input" />
             <select className="filter-select" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
               <option value="all">All Statuses</option>
               <option value="new">New</option>

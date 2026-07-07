@@ -1672,7 +1672,7 @@ footer p {
 .admin-dashboard {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 40px clamp(24px, 5vw, 72px);
+  padding: 140px clamp(24px, 5vw, 72px) 40px;
   min-height: 80vh;
 }
 
@@ -1995,22 +1995,6 @@ footer p {
   gap: 12px;
   margin-bottom: 20px;
   flex-wrap: wrap;
-}
-
-.search-input {
-  flex: 1;
-  min-width: 250px;
-  padding: 10px 16px;
-  border: 1px solid var(--line);
-  background: var(--chalk);
-  color: var(--ink);
-  border-radius: 0;
-  outline: none;
-  font-size: 0.85rem;
-}
-
-.search-input:focus {
-  border-color: var(--oxide);
 }
 
 .filter-select {
