@@ -155,7 +155,7 @@ function Header({ inquiryCount, onOpenCart, user, onLogout, isAdminActive, onTog
 
   return (
     <header className="site-header" aria-label="Main navigation">
-      <a className="brand" href="#top" aria-label="SOMTO ATELIER home" onClick={() => { if (isAdminActive) onToggleAdmin(false); }} style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+      <a className="brand" href="#top" aria-label="SOMTO ATELIER home" onClick={(e) => { e.preventDefault(); if (isAdminActive) onToggleAdmin(false); else window.scrollTo({ top: 0, behavior: "smooth" }); }} style={{ display: "flex", alignItems: "center", gap: "10px" }}>
         <span>SOMTO ATELIER</span>
       </a>
 
@@ -923,7 +923,6 @@ function AdminDashboard({ token, onClose }) {
   const [interestFilter, setInterestFilter] = useState("all");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
-  const [sortBy, setSortBy] = useState("date-desc");
 
   const [selectedIds, setSelectedIds] = useState([]);
   const [bulkStatus, setBulkStatus] = useState("new");
@@ -983,19 +982,7 @@ function AdminDashboard({ token, onClose }) {
     return true;
   });
 
-  const sortedInquiries = [...filteredInquiries].sort((a, b) => {
-    switch (sortBy) {
-      case "date-asc": return new Date(a.createdAt) - new Date(b.createdAt);
-      case "date-desc": return new Date(b.createdAt) - new Date(a.createdAt);
-      case "name-asc": return a.name.localeCompare(b.name);
-      case "name-desc": return b.name.localeCompare(a.name);
-      case "status": {
-        const order = { new: 0, contacted: 1, resolved: 2 };
-        return (order[a.status] || 0) - (order[b.status] || 0);
-      }
-      default: return new Date(b.createdAt) - new Date(a.createdAt);
-    }
-  });
+  const sortedInquiries = filteredInquiries;
 
   const now = new Date();
   const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
@@ -1261,13 +1248,6 @@ function AdminDashboard({ token, onClose }) {
               <option value="all">All Interests</option>
               {uniqueInterests.map(int => <option key={int} value={int}>{int}</option>)}
             </select>
-            <select className="filter-select" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
-              <option value="date-desc">Newest First</option>
-              <option value="date-asc">Oldest First</option>
-              <option value="name-asc">Name A-Z</option>
-              <option value="name-desc">Name Z-A</option>
-              <option value="status">By Status</option>
-            </select>
           </div>
 
           <div className="admin-controls">
@@ -1465,7 +1445,36 @@ export default function App() {
   };
 
   const setCartOpen = (val) => withTransition(() => setCartOpenState(val));
-  const setIsAdminActive = (val) => withTransition(() => setIsAdminActiveState(val));
+
+  const setIsAdminActive = (val) => {
+    withTransition(() => setIsAdminActiveState(val));
+    if (val) {
+      window.history.pushState({ admin: true }, "", "#admin");
+    } else {
+      window.history.pushState({ admin: false }, "", "#");
+    }
+  };
+
+  useEffect(() => {
+    const initAdmin = window.location.hash === "#admin";
+    if (initAdmin) {
+      window.history.replaceState({ admin: true }, "", "#admin");
+      setIsAdminActiveState(true);
+    } else {
+      window.history.replaceState({ admin: false }, "", window.location.pathname + window.location.search);
+    }
+
+    const handlePopState = () => {
+      const isAdmin = window.location.hash === "#admin";
+      setIsAdminActiveState(isAdmin);
+    };
+    window.addEventListener("popstate", handlePopState);
+    window.addEventListener("hashchange", handlePopState);
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+      window.removeEventListener("hashchange", handlePopState);
+    };
+  }, []);
 
   // Toggle ambient soundscape
   const toggleAmbient = () => {
@@ -1533,10 +1542,10 @@ export default function App() {
     withTransition(() => {
       setToken(null);
       setUser(null);
-      setIsAdminActiveState(false);
       localStorage.removeItem("token");
       localStorage.removeItem("user");
     });
+    setIsAdminActive(false);
   }
 
   function addInquiryItem(productName) {
